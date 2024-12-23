@@ -286,7 +286,7 @@ namespace MythosOfMoonlight.Common.Base
         /// <param name="timeMul"></param>
         /// <param name="lockDir"></param>
         /// <param name="getMouseAngle"></param>
-        public void PrepareSwing(float radius, float angle, float timeMul, bool lockDir = true, bool getMouseAngle = true, float rot1 = -12f)
+        public void PrepareSwing(float radius, float angle, float timeMul, bool lockDir = true, bool getMouseAngle = true, float rot1 = -12f, float lerpOptional = -1f)
         {
             useTrail = false;
 
@@ -295,7 +295,7 @@ namespace MythosOfMoonlight.Common.Base
 
             float targetRot = angle;
 
-            mainVec = Vector2.Lerp(mainVec, Vector2Ellipse(radius, targetRot, rot1), 0.08f / timeMul);
+            mainVec = Vector2.Lerp(mainVec, Vector2Ellipse(radius, targetRot, rot1), (lerpOptional == -1f) ? 0.1f / timeMul : lerpOptional);
 
             Projectile.rotation = mainVec.ToRotation();
 

@@ -227,6 +227,110 @@ namespace MythosOfMoonlight.Common.Utilities
             settings.Owner.itemRotation = (Projectile.velocity * Projectile.direction).ToRotation();
         }
 
+        public static bool ConsumeAmmo(Item heldItem, Player player, out int AmmoItemTypeFound, out int damage, int amount = 1, bool consume = true, int overrideAmmoItemType = -69420)
+        {
+            bool validAmmoFound = false;
+            AmmoItemTypeFound = -1;
+            damage = 0;
+
+            if (heldItem.useAmmo == AmmoID.None && overrideAmmoItemType == -69420) //the weapon doesnt use ammo + no specified ammo type to use (that the weapon may or may not use), so end here
+                return false;
+
+            if (!validAmmoFound)
+            {
+                for (int i = 0; i < player.inventory.Length; i++)
+                {
+                    Item item = player.inventory[i];
+
+                    //use the item's ammo type (optional type wasnt touched)
+                    if (overrideAmmoItemType == -69420)
+                    {
+                        if (item.ammo == heldItem.useAmmo)
+                        {
+                            if (item.stack > amount)
+                            {
+                                if (consume)
+                                    item.stack -= amount;
+
+                                if (item.stack <= 0)
+                                {
+                                    item.active = false;
+                                    item.TurnToAir();
+                                }
+
+                                AmmoItemTypeFound = item.shoot;
+                                damage = item.damage;
+                                validAmmoFound = true;
+                                break;
+                            }
+
+                            else
+                            {
+                                //check if the item was something like an endless pouch. these still count!
+                                if (!item.consumable && item.ammo == heldItem.useAmmo)
+                                {
+                                    AmmoItemTypeFound = item.shoot;
+                                    damage = item.damage;
+                                    validAmmoFound = true;
+                                    break;
+                                }
+
+                                //no item or pouch
+                                else
+                                {
+                                    validAmmoFound = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    //use the provided ammo type
+                    else
+                    {
+                        if (item.type == overrideAmmoItemType)
+                        {
+                            if (item.stack > amount)
+                            {
+                                if (consume)
+                                    item.stack -= amount;
+
+                                if (item.stack <= 0)
+                                {
+                                    item.active = false;
+                                    item.TurnToAir();
+                                }
+
+                                AmmoItemTypeFound = item.shoot;
+                                damage = item.damage;
+                                validAmmoFound = true;
+                                break;
+                            }
+
+                            else
+                            {
+                                if (!item.consumable && item.type == overrideAmmoItemType)
+                                {
+                                    AmmoItemTypeFound = item.shoot;
+                                    damage = item.damage;
+                                    validAmmoFound = true;
+                                    break;
+                                }
+
+                                else
+                                {
+                                    validAmmoFound = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return validAmmoFound;
+        }
+
         public static string TryGetTextureFromOther<T>() where T : ModType => GetInstance<T>().GetType().Namespace.Replace(".", "/") + "/" + GetInstance<T>().Name;
     }
 }

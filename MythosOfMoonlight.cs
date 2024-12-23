@@ -535,6 +535,8 @@ namespace MythosOfMoonlight
         public static Effect Bloom2, MeleeTrail, FadedMeleeTrail = null;
         public static MythosOfMoonlight Instance { get; set; }
 
+        public static List<Action> StarryDrawCache = [];
+
         public MythosOfMoonlight()
         {
             Instance = this;
@@ -545,6 +547,9 @@ namespace MythosOfMoonlight
             On_FilterManager.EndCapture -= FilterManager_EndCapture;
             On_Player.SetTalkNPC -= Player_SetTalkNPC;
             Main.OnResolutionChanged -= Main_OnResolutionChanged;
+
+            StarryDrawCache?.Clear();
+            StarryDrawCache = [];
         }
 
         public override void Load()
@@ -559,6 +564,8 @@ namespace MythosOfMoonlight
             On_Player.SetTalkNPC += Player_SetTalkNPC;
             Main.OnResolutionChanged += Main_OnResolutionChanged;
             On_Main.DrawProjectiles += DrawProj;
+
+            StarryDrawCache ??= [];
         }
 
         private void LoadShaders()
@@ -638,8 +645,17 @@ namespace MythosOfMoonlight
                 gd.SetRenderTarget(render[0]);
                 gd.Clear(Color.Transparent);
                 sb.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+
+                foreach (Action drawAction in StarryDrawCache)
+                {
+                    drawAction?.Invoke(); //anything can be drawn using the magic
+                }
+
                 Starry2.DrawAll(Main.spriteBatch);
                 Starry.DrawAll(Main.spriteBatch);
+
+                StarryDrawCache?.Clear();
+
                 sb.End();
 
                 gd.SetRenderTarget(render[1]);
@@ -784,17 +800,25 @@ namespace MythosOfMoonlight
         {
             graphicsDevice.SetRenderTarget(Main.screenTargetSwap);
             graphicsDevice.Clear(Color.Transparent);
+
             Main.spriteBatch.Begin(0, BlendState.AlphaBlend);
+
             Main.spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
+
             Main.spriteBatch.End();
+
             graphicsDevice.SetRenderTarget(OrigRender);
             graphicsDevice.Clear(Color.Transparent);
+
             Main.spriteBatch.Begin((SpriteSortMode)1, BlendState.AlphaBlend);
             Main.spriteBatch.Draw(Main.screenTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, 0, 0f);
             Main.spriteBatch.End();
+
             graphicsDevice.SetRenderTarget(DustTrail1);
             graphicsDevice.Clear(Color.Transparent);
+
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+           
             foreach (Dust dust in Main.dust)
             {
                 if (dust.type == DustType<StarineDust>() && dust.velocity.Length() > 0 && dust.active)
@@ -805,12 +829,17 @@ namespace MythosOfMoonlight
                     }
                 }
             }
+
             Main.spriteBatch.End();
+
             graphicsDevice.SetRenderTarget(Main.screenTarget);
             graphicsDevice.Clear(Color.Transparent);
+
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive);
+
             Main.spriteBatch.Draw(OrigRender, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, 0, 0f);
             Main.spriteBatch.Draw(DustTrail1, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, 0, 0f);
+
             Main.spriteBatch.End();
         }
       

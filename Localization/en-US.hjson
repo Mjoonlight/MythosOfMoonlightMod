@@ -435,6 +435,11 @@ Mods: {
 				DisplayName: Star Whip
 				Tooltip: ""
 			}
+
+			EstrellaR: {
+				DisplayName: Estrella R
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {
@@ -570,6 +575,7 @@ Mods: {
 			SlashWave.DisplayName: Slash Wave
 			PurpurineSaberProj.DisplayName: Purpurine Saber Proj
 			CrawshotProj.DisplayName: Crawshot Proj
+			EstrellaProj2.DisplayName: Estrella Proj2
 		}
 
 		NPCs: {

@@ -29,6 +29,8 @@ namespace MythosOfMoonlight.Dusts
 
             dust.velocity = Vector2.Lerp(dust.velocity, Vector2.Zero, 0.05f);
 
+            dust.position += dust.velocity;
+
             if (dust.scale <= 0 || dust.alpha >= 255 || dust.velocity == Vector2.Zero)
             {
                 dust.active = false;
