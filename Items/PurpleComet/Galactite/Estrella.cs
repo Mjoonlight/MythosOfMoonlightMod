@@ -62,6 +62,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
                 .Register();
         }
     }
+
     public class EstrellaP : HeldSword
     {
         public override string Texture => "MythosOfMoonlight/Items/PurpleComet/Galactite/Estrella";

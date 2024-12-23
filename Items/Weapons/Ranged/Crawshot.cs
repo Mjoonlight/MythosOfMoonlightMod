@@ -40,6 +40,7 @@ namespace MythosOfMoonlight.Items.Weapons.Ranged
             Item.shoot = ProjectileID.Bullet;
 
         }
+
         public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
         {
             Vector2 muzzleOffset = Vector2.Normalize(new Vector2(velocity.X, velocity.Y)) * 25f;
@@ -47,6 +48,7 @@ namespace MythosOfMoonlight.Items.Weapons.Ranged
                 position += muzzleOffset;
             position += Vector2.Normalize(velocity) * -2f;
         }
+
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
 

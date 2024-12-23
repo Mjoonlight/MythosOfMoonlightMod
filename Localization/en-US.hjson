@@ -42,6 +42,11 @@ Mods: {
 				DisplayName: Communicator Iris B
 				Description: Mods.MythosOfMoonlight.Buffs.CommunicatorIrisB.Description
 			}
+
+			StarlashBuff: {
+				DisplayName: Starlash Buff
+				Description: Mods.MythosOfMoonlight.Buffs.StarlashBuff.Description
+			}
 		}
 
 		Items: {
@@ -415,6 +420,21 @@ Mods: {
 				DisplayName: Coldwind Pendant
 				Tooltip: ""
 			}
+
+			Starlash: {
+				DisplayName: Starlash
+				Tooltip: ""
+			}
+
+			StarlashBuffPickup: {
+				DisplayName: Starlash Buff Pickup
+				Tooltip: ""
+			}
+
+			StarWhip: {
+				DisplayName: Star Whip
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {
@@ -545,6 +565,10 @@ Mods: {
 			FastScholarArrow.DisplayName: Fast Scholar Arrow
 			ScholarChargeUp.DisplayName: Scholar Charge Up
 			ScholarChargeUp2.DisplayName: Scholar Charge Up2
+			StarlashPro.DisplayName: Starlash Pro
+			StarWhipPro.DisplayName: Star Whip Pro
+			SlashWave.DisplayName: Slash Wave
+			PurpurineSaberProj.DisplayName: Purpurine Saber Proj
 		}
 
 		NPCs: {
