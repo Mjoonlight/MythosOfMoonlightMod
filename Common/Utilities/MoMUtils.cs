@@ -171,6 +171,62 @@ namespace MythosOfMoonlight.Common.Utilities
             }
         }
 
+        public static void SimpleDrawProjectile(this Projectile Projectile, Texture2D texture, Color Color, bool IsGlow, float scaleMod = 1f, float extraRot = 0f)
+        {
+            SpriteEffects spriteEffects = Projectile.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+
+            int frameHeight = texture.Height / Main.projFrames[Projectile.type];
+            int startY = frameHeight * Projectile.frame;
+
+            Rectangle sourceRectangle = new(0, startY, texture.Width, frameHeight);
+
+            Vector2 origin = sourceRectangle.Size() / 2f;
+            Vector2 drawPos = Projectile.Center - Main.screenPosition;
+
+            Main.EntitySpriteDraw(texture, drawPos, new Microsoft.Xna.Framework.Rectangle?(sourceRectangle), IsGlow ? Color : Projectile.GetAlpha(Color), Projectile.rotation + extraRot, origin, Projectile.scale * scaleMod, spriteEffects, 0);
+        }
+
+        public static void SimpleDrawProjectile_Offset(this Projectile Projectile, Texture2D texture, Vector2 drawOffset, Color Color, bool IsGlow, float scaleMod = 1f, float extraRot = 0f)
+        {
+            SpriteEffects spriteEffects = Projectile.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+
+            int frameHeight = texture.Height / Main.projFrames[Projectile.type];
+            int startY = frameHeight * Projectile.frame;
+
+            Rectangle sourceRectangle = new(0, startY, texture.Width, frameHeight);
+
+            Vector2 origin = sourceRectangle.Size() / 2f;
+            Vector2 drawPos = Projectile.Center - Main.screenPosition;
+
+            Main.EntitySpriteDraw(texture, drawPos + drawOffset, new Microsoft.Xna.Framework.Rectangle?(sourceRectangle), IsGlow ? Color : Projectile.GetAlpha(Color), Projectile.rotation + extraRot, origin, Projectile.scale * scaleMod, spriteEffects, 0);
+        }
+
+        public static void ManageHeldProj(this Projectile Projectile, Vector2 armPos, HeldprojSettings settings)
+        {
+            if (Main.myPlayer == Projectile.owner)
+            {
+                Vector2 oldVelocity = Projectile.velocity;
+
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(Main.MouseWorld), Utils.GetLerpValue(5f, 55f, Projectile.Distance(Main.MouseWorld), true)).RotatedBy(settings.AimOffset);
+
+                if (Projectile.velocity != oldVelocity)
+                {
+                    Projectile.netSpam = 0;
+                    Projectile.netUpdate = true;
+                }
+            }
+
+            Projectile.Center = armPos + Projectile.velocity * settings.HoldOffset;
+            Projectile.rotation = Projectile.velocity.ToRotation() + settings.RotationOffset;
+            Projectile.spriteDirection = Projectile.direction;
+
+            settings.Owner.ChangeDir(Projectile.direction);
+            settings.Owner.heldProj = Projectile.whoAmI;
+            settings.Owner.itemTime = 2;
+            settings.Owner.itemAnimation = 2;
+            settings.Owner.itemRotation = (Projectile.velocity * Projectile.direction).ToRotation();
+        }
+
         public static string TryGetTextureFromOther<T>() where T : ModType => GetInstance<T>().GetType().Namespace.Replace(".", "/") + "/" + GetInstance<T>().Name;
     }
 }

@@ -410,7 +410,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
             if (Projectile.timeLeft >= 25)
                 Projectile.velocity *= 1.09998f;
 
-            //Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.velocity.RotatedBy(Pi / 18f), 0.2f);
+            //Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.velocity.RotatedBy(Pi / 18f * randDir), 0.012f);
 
             Projectile.rotation = Lerp(Projectile.rotation, Projectile.rotation + (TwoPi * 0.39f), 0.2f);
 
