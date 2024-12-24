@@ -18,6 +18,7 @@ using Terraria.Utilities;
 using MythosOfMoonlight.Common.Base;
 using MythosOfMoonlight.Common.Systems;
 using MythosOfMoonlight.Items.PurpleComet.IridicSet;
+using System.Collections.Generic;
 
 namespace MythosOfMoonlight.Items.PurpleComet.Galactite
 {
@@ -157,7 +158,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
         public override void PreExtraDraw(float progress)
         {
             Player player = Main.player[Projectile.owner];
-            Texture2D tex = Helper.GetTex(Texture + "_Glow2");
+            Texture2D tex = Helper.GetTex(Texture + "_Glow2"); //not used 
             Main.spriteBatch.Reload(BlendState.Additive);
 
             float s = 1;
@@ -247,12 +248,11 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
             return (Projectile.ai[2].CloseTo(0.5f, 0.35f));
         }
     }
+
     public class EstrellaP2 : ModProjectile
     {
         public override void SetStaticDefaults()
         {
-            ProjectileID.Sets.TrailCacheLength[Type] = 25;
-            ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
             Main.projFrames[Type] = 4;
             Projectile.AddElement(CrossModHelper.Celestial);
         }
@@ -268,6 +268,9 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
             Projectile.localNPCHitCooldown = 500;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.tileCollide = false;
+
+            ProjectileID.Sets.TrailCacheLength[Type] = 40;
+            ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
         }
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
@@ -280,43 +283,20 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
             for (int i = 0; i < 7; i++)
                 Helper.SpawnDust(Projectile.Center, Projectile.Size, 58, Projectile.velocity.Length() * 0.3f * Main.rand.NextVector2Unit(), dustModification: new Action<Dust>((d) => { d.color = Color.Violet; }));
 
-        }
-        float alpha = 1;
-        public override bool PreDraw(ref Color lightColor)
-        {
-            Texture2D tex = Helper.GetTex(Texture + "Star");
-            Texture2D tex2 = Helper.GetExtraTex("Extra/explosion_1");
-            Texture2D tex3 = TextureAssets.Projectile[Type].Value;
-            Main.spriteBatch.Draw(tex3, Projectile.Center - Main.screenPosition, new Rectangle(0, Projectile.frame * 66, 40, 66), Color.White * alpha, Projectile.velocity.ToRotation() - MathHelper.PiOver2, Projectile.Size / 2, Projectile.scale, SpriteEffects.None, 0f);
-
-            Main.spriteBatch.Reload(BlendState.Additive);
-            var fadeMult = 1f / ProjectileID.Sets.TrailCacheLength[Projectile.type];
-            for (int i = 0; i < Projectile.oldPos.Length - (Projectile.timeLeft < 25 ? 25 - Projectile.timeLeft : 0); i++)
+            for (int i = 0; i < 23; i++)
             {
-                float mult = (1f - fadeMult * i) * (Projectile.penetrate + 1) / 3;
-                if (i > 0)
-                    for (float j = 0; j < 5; j++)
-                    {
-                        Vector2 pos = Vector2.Lerp(Projectile.oldPos[i], Projectile.oldPos[i - 1], (float)(j / 5));
-                        Main.spriteBatch.Draw(tex2, pos + new Vector2(MathF.Sin((Main.GlobalTimeWrappedHourly + i * j) * 5) * 10 * mult, 0).RotatedBy(Projectile.velocity.ToRotation() + MathHelper.PiOver2) + Projectile.Size / 2 - Main.screenPosition, null, Color.Lerp(Color.Violet, Color.DarkViolet, (float)(j / 5)) * mult, Projectile.oldRot[i], tex2.Size() / 2, mult * 0.03f, SpriteEffects.None, 0);
-                        Main.spriteBatch.Draw(tex2, pos + new Vector2(MathF.Sin((Main.GlobalTimeWrappedHourly + i * j) * 5) * 10 * mult, 0).RotatedBy(Projectile.velocity.ToRotation() + MathHelper.PiOver2) + Projectile.Size / 2 - Main.screenPosition, null, Color.White * 0.25f * mult, Projectile.oldRot[i], tex2.Size() / 2, mult * 0.03f, SpriteEffects.None, 0);
+                Vector2 pos = target.Center + Main.rand.NextVector2Circular(2f, 2f);
+                Vector2 vel = Main.rand.NextVector2Circular(2f, 2f);
 
-                        Main.spriteBatch.Draw(tex2, pos + new Vector2(MathF.Sin((Main.GlobalTimeWrappedHourly + i * j) * 5) * 10 * -mult, 0).RotatedBy(Projectile.velocity.ToRotation() + MathHelper.PiOver2) + Projectile.Size / 2 - Main.screenPosition, null, Color.Lerp(Color.Violet, Color.DarkViolet, (float)(j / 5)) * mult, Projectile.oldRot[i], tex2.Size() / 2, mult * 0.03f, SpriteEffects.None, 0);
-                        Main.spriteBatch.Draw(tex2, pos + new Vector2(MathF.Sin((Main.GlobalTimeWrappedHourly + i * j) * 5) * 10 * -mult, 0).RotatedBy(Projectile.velocity.ToRotation() + MathHelper.PiOver2) + Projectile.Size / 2 - Main.screenPosition, null, Color.White * 0.25f * mult, Projectile.oldRot[i], tex2.Size() / 2, mult * 0.03f, SpriteEffects.None, 0);
-                    }
+                for (int j = 0; j < 2; j++)
+                    CreateDust(DustType<PurpurineDust>(), vel * Main.rand.NextFloat(4f, 9f), pos, Color.Violet, Main.rand.NextFloat(1.2f, 1.92f));
             }
-            Main.spriteBatch.Reload(BlendState.AlphaBlend);
+        }
 
-            Main.spriteBatch.Draw(tex, Projectile.Center + new Vector2(0, 12) - Main.screenPosition, null, Color.White * alpha * 0.75f, Projectile.rotation - MathHelper.PiOver2, tex.Size() / 2, Projectile.scale, SpriteEffects.None, 0f);
-            return false;
-        }
-        public override Color? GetAlpha(Color lightColor)
-        {
-            return Color.White * alpha;
-        }
         public override void AI()
         {
             Helper.SpawnDust(Projectile.position, Projectile.Size, ModContent.DustType<PurpurineDust>(), Projectile.velocity * 0.5f);
+           
             if (Projectile.frameCounter++ % 3 == 0)
             {
                 if (Projectile.frame < 3)
@@ -324,6 +304,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
                 else
                     Projectile.frame = 0;
             }
+
             if (Projectile.timeLeft > 475 && Projectile.ai[2] == 0)
                 Projectile.velocity = Projectile.velocity.Length() * Helper.FromAToB(Projectile.Center, Main.npc[(int)Projectile.ai[0]].Center + Main.npc[(int)Projectile.ai[0]].velocity);
 
@@ -332,11 +313,144 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
                 Projectile.velocity *= 1.15f;
             }
 
-            Projectile.rotation += MathHelper.ToRadians(3);
+            Projectile.rotation += ToRadians(3);
+           
             if (Projectile.timeLeft < 20)
                 alpha -= 0.05f;
+
+            for (int i = 0; i < 3; i++)
+            {
+                Vector2 pos = Projectile.Center + new Vector2(Main.rand.NextFloat(-5f, 6f), 0f);
+                Vector2 vel = -Projectile.velocity * Main.rand.NextFloat(0.1f, 0.25f);
+
+                var d = CreateDust(DustType<StarryStretchyGlow>(), vel, pos, Color.White, Main.rand.NextFloat(2f, 4.2f));
+                d.customData = new Vector2(1f, Main.rand.NextFloat(0.3f, 0.6f));
+            }
+
+            if (Projectile.Center.Y > Main.player[Projectile.owner].Center.Y)
+                Projectile.tileCollide = true;
+        }
+
+        public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
+        {
+            width = height = 10;
+            return base.TileCollideStyle(ref width, ref height, ref fallThrough, ref hitboxCenterFrac);
+        }
+
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+            Projectile.NewProjectile(null, Projectile.Center + Helper.FromAToB(Projectile.Center, Projectile.Center + new Vector2(0f, -15f)) * 20, Vector2.Zero, ProjectileType<EstrellaPImpact>(), 0, 0);
+            Projectile.ai[2] = 1;
+            for (int i = 0; i < 7; i++)
+                Helper.SpawnDust(Projectile.Center, Projectile.Size, ModContent.DustType<PurpurineDust>(), Projectile.velocity * 0.3f);
+            for (int i = 0; i < 7; i++)
+                Helper.SpawnDust(Projectile.Center, Projectile.Size, ModContent.DustType<PurpurineDust>(), Projectile.velocity.Length() * 0.3f * Main.rand.NextVector2Unit());
+            for (int i = 0; i < 7; i++)
+                Helper.SpawnDust(Projectile.Center, Projectile.Size, 58, Projectile.velocity.Length() * 0.3f * Main.rand.NextVector2Unit(), dustModification: new Action<Dust>((d) => { d.color = Color.Violet; }));
+
+            for (int i = 0; i < 23; i++)
+            {
+                Vector2 pos = Projectile.Center + Main.rand.NextVector2Circular(2f, 2f);
+                Vector2 vel = Main.rand.NextVector2Circular(2f, 2f);
+
+                for (int j = 0; j < 2; j++)
+                    CreateDust(DustType<PurpurineDust>(), vel * Main.rand.NextFloat(4f, 9f), pos, Color.Violet, Main.rand.NextFloat(1.2f, 1.92f));
+            }
+
+            return base.OnTileCollide(oldVelocity);
+        }
+
+        public static int Strike = 0;
+
+        public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
+        {
+            Strike = 1;
+
+            modifiers.DefenseEffectiveness *= 0.75f; //ignore defense (25%)??
+        }
+
+        float alpha = 1, animationOffset;
+
+        public override bool PreDraw(ref Color lightColor)
+        {
+            Texture2D tex = Helper.GetTex(Texture + "Star");
+            Texture2D tex3 = TextureAssets.Projectile[Type].Value;
+
+            animationOffset -= 0.05f;
+
+            if (animationOffset <= 0)
+                animationOffset = 1;
+
+            animationOffset = Clamp(animationOffset, float.Epsilon, 1 - float.Epsilon);
+
+            List<VertexPositionColorTexture> vertices = new List<VertexPositionColorTexture>(ProjectileID.Sets.TrailCacheLength[Type]);
+            for (int i = 0; i < Projectile.oldPos.Length - 1; i++)
+            {
+                if (Projectile.oldPos[i] == Vector2.Zero || i == 0) continue;
+                float mult = 1f - (1f / Projectile.oldPos.Length) * i;
+                mult *= mult;
+
+                float __off = animationOffset;
+                if (__off > 1) __off = -__off + 1;
+                float _off = __off + (float)i / Projectile.oldPos.Length;
+
+                if (mult > 0)
+                {
+                    vertices.Add(Helper.AsVertex(Projectile.oldPos[i] + (Projectile.velocity.ToRotation()).ToRotationVector2() * 6 - Main.screenPosition + Projectile.Size / 2 + new Vector2(38f * mult, 30f).RotatedBy(Helper.FromAToB(Projectile.oldPos[i], Projectile.oldPos[i + 1]).ToRotation() + MathHelper.PiOver2), Color.Orchid * mult * 1f, new Vector2(_off, 0)));
+                    vertices.Add(Helper.AsVertex(Projectile.oldPos[i] + (Projectile.velocity.ToRotation()).ToRotationVector2() * 6 - Main.screenPosition + Projectile.Size / 2 + new Vector2(38f * mult, -30f).RotatedBy(Helper.FromAToB(Projectile.oldPos[i], Projectile.oldPos[i + 1]).ToRotation() - MathHelper.PiOver2), Color.Orchid * mult * 1f, new Vector2(_off, 1)));
+                }
+            }
+
+            Main.spriteBatch.SaveCurrent();
+
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointWrap, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+            if (vertices.Count > 2)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    Helper.DrawTexturedPrimitives(vertices.ToArray(), PrimitiveType.TriangleStrip, Helper.GetExtraTex("Extra/trail_01"), false);
+                    Helper.DrawTexturedPrimitives(vertices.ToArray(), PrimitiveType.TriangleStrip, Helper.GetExtraTex("Extra/Ex1_backup"), false);
+                }
+            }
+
+            Main.spriteBatch.ApplySaved();
+
+            Main.spriteBatch.Draw(tex3, Projectile.Center - Main.screenPosition, new Rectangle(0, Projectile.frame * 66, 40, 66), Color.White * alpha, Projectile.velocity.ToRotation() - MathHelper.PiOver2, Projectile.Size / 2, Projectile.scale, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(tex, Projectile.Center + new Vector2(0, 12) - Main.screenPosition, null, Color.White * alpha * 0.75f, Projectile.rotation - MathHelper.PiOver2, tex.Size() / 2, Projectile.scale, SpriteEffects.None, 0f);
+
+            return false;
+        }
+
+        public override Color? GetAlpha(Color lightColor)
+        {
+            return Color.White * alpha;
+        }
+
+        public override void Load()
+        {
+            On_CombatText.NewText_Rectangle_Color_string_bool_bool += CombatText_NewText_Rectangle_Color_string_bool_bool;
+        }
+
+        //when you deal damage the color is changed to a new one!@!e32q342
+        private int CombatText_NewText_Rectangle_Color_string_bool_bool(On_CombatText.orig_NewText_Rectangle_Color_string_bool_bool orig, Rectangle location, Color color, string text, bool dramatic, bool dot)
+        {
+            if (Strike > 0)
+            {
+                color = Color.Lerp(Color.Violet, Color.Purple, 0.3f);
+                Strike--;
+            }
+
+            return orig(location, color, text, dramatic, dot);
+        }
+
+        public override void Unload()
+        {
+            On_CombatText.NewText_Rectangle_Color_string_bool_bool -= CombatText_NewText_Rectangle_Color_string_bool_bool;
         }
     }
+
     public class EstrellaPSlice : ModProjectile
     {
         public override void SetStaticDefaults()
@@ -377,6 +491,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
                 Projectile.Kill();
         }
     }
+
     public class EstrellaPImpact : ModProjectile
     {
         public override string Texture => "MythosOfMoonlight/Assets/Textures/Extra/blank";
@@ -440,8 +555,6 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
             Projectile.ai[1] = MathHelper.Lerp(Projectile.ai[1], 1, 0.1f);
         }
     }
-
-
 
     public class EstrellaR : ModItem
     {
@@ -541,16 +654,24 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
         public override void DrawSelf(SpriteBatch spriteBatch, Color lightColor, Vector4 diagonal = default, Vector2 drawScale = default, Texture2D glowTexture = null)
         {
             if (drawScale == default)
-                drawScale = new Vector2(-0.12f, 1.15f);
+                drawScale = new Vector2(-0.01f, 1.15f);
 
             diagonal = new Vector4(0, 1, 1, 0);
 
             Vector2 drawCenter = Projectile.Center - Main.screenPosition;
 
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+            BlendState _blendState = new BlendState();
+            _blendState.AlphaSourceBlend = Blend.SourceAlpha;
+            _blendState.AlphaDestinationBlend = Blend.InverseSourceAlpha;
 
-            DrawVertexByTwoLine(Request<Texture2D>(Texture).Value, Color.Lerp(Color.Violet, Color.White, 0.95f), diagonal.XY(), diagonal.ZW(), drawCenter + mainVec * drawScale.X, drawCenter + mainVec * drawScale.Y);
+            _blendState.ColorSourceBlend = Blend.SourceAlpha;
+            _blendState.ColorDestinationBlend = Blend.InverseSourceAlpha;
+
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, _blendState, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+           
+            DrawVertexByTwoLine(Request<Texture2D>(Texture).Value, lightColor, diagonal.XY(), diagonal.ZW(), drawCenter + mainVec * drawScale.X, drawCenter + mainVec * drawScale.Y);
+            DrawVertexByTwoLine(Request<Texture2D>(Texture + "_Glow").Value, Color.White, diagonal.XY(), diagonal.ZW(), drawCenter + mainVec * drawScale.X, drawCenter + mainVec * drawScale.Y);
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
@@ -567,18 +688,16 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
             //faded
             DrawTrailSection(TrailColorTex2(), TrailShapeTex(), 0.5f, 0.6f, 1f);
 
+            //guh
+            MythosOfMoonlight.StarryDrawCache.Add(() =>
+            {
+                DrawTrailSection(TrailColorTex(), TrailTexturePath + "TrailShape_White", 3.5f, 0.12f, 0.98f);
+            });
+
             //blurry + glowy sigmaness
             VFXManager.DrawCache.Add(() =>
             {
                 DrawTrailSection(TrailColorTex(), TrailShapeTex(), 5f, 0.94f, 0.98f);
-            });
-
-            // Main.spriteBatch.Reload(BlendState.Additive);
-
-            MythosOfMoonlight.StarryDrawCache.Add(() => 
-            {
-                DrawTrailSection(TrailColorTex(), TrailTexturePath + "TrailShape_White", 5f, 0.1f, 0.98f);
-                //DrawTrailSection(TrailColorTex(), "MythosOfMoonlight/Dusts/Starry2", 5f, 0.1f, 0.98f);
             });
         }
 
@@ -594,7 +713,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
 
         public override void Attack()
         {
-            Projectile.Center = Player.Center + Utils.SafeNormalize(mainVec, Vector2.One) * disFromPlayer + ((Projectile.direction == -1) ? new Vector2(3f, -3f) : new Vector2(-9f, 2f));
+            //Projectile.Center = Player.Center + Utils.SafeNormalize(mainVec, Vector2.One) * disFromPlayer + ((Projectile.direction == -1) ? new Vector2(3f, -3f) : new Vector2(-9f, 2f));
 
             void SwingEffects()
             {
@@ -685,23 +804,23 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
             if (attackType == 0)
             {
                 float max = 30f;
-                float max2 = 50f;
-                float end = 75f;
+                float max2 = 60f;
+                float end = 85f;
 
-                float t2 = (timer < max2 + 10 || timer > end - 10) ? 1f : 1.15f;
+                float t2 = (timer < end - 10 && timer > max2 + 10) ? 1.2f : 0.925f;
 
                 if (timer < max)
                 {
-                    PrepareSwing(78f, PiOver2 - Player.direction * -0.85f, t, true, true, -12f, b == false ? 1f : -1f);
+                    PrepareSwing(88f, PiOver2 - Player.direction * -0.85f, t, true, true, -12f, b == false ? 1f : -1f);
                 }
 
                 if (timer > max && timer < max2)
                 {
-                    PrepareSwing(79f, PiOver2 - Player.direction * -0.72f, t, true, true, -12f);
+                    PrepareSwing(89f, PiOver2 - Player.direction * -0.72f, t, true, true, -12f);
                     b = true;
                 }
 
-                EnactSwing(82f, max2, end, MiscArray[1] + 0.09f, -0.21f * t2, 1400f, t, [SwingEffects, null], -1, -12f);
+                EnactSwing(92f, max2, end, MiscArray[1] + 0.09f, -0.21f * t2, 1400f, t, [SwingEffects, null], -1, -12f);
 
                 if (timer > end)
                     isAttacking = false;
@@ -723,15 +842,15 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
 
                 if (timer < max)
                 {
-                    PrepareSwing(78f, PiOver2 + Player.direction * 0.85f, t, true, true, -12f);
+                    PrepareSwing(88f, PiOver2 + Player.direction * 0.85f, t, true, true, -12f);
                 }
 
                 if (timer > max && timer < max2)
                 {
-                    PrepareSwing(79f, PiOver2 + Player.direction * 0.67f, t, true, true, -12f);
+                    PrepareSwing(89f, PiOver2 + Player.direction * 0.67f, t, true, true, -12f);
                 }
 
-                EnactSwing(82f, max2, end, MiscArray[1] + 0.23f, 0.21f, 400f, t, [SwingEffects, null], -1, -13.2f);
+                EnactSwing(92f, max2, end, MiscArray[1] + 0.23f, 0.21f, 400f, t, [SwingEffects, null], -1, -13.2f);
 
                 if (timer > end)
                     isAttacking = false;
@@ -753,15 +872,15 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
 
                 if (timer < max)
                 {
-                    PrepareSwing(78f, PiOver2 - Player.direction * -0.95f, t, true, true, -12f);
+                    PrepareSwing(88f, PiOver2 - Player.direction * -0.95f, t, true, true, -12f);
                 }
 
                 if (timer > max && timer < max2)
                 {
-                    PrepareSwing(79f, PiOver2 - Player.direction * -0.67f, t, true, true, -12f);
+                    PrepareSwing(89f, PiOver2 - Player.direction * -0.67f, t, true, true, -12f);
                 }
 
-                EnactSwing(82f, max2, end, MiscArray[1] + 0.09f, 0.21f * t2, 1400f, t, [SwingEffects, SwingEffects], 76f, -15.2f);
+                EnactSwing(92f, max2, end, MiscArray[1] + 0.09f, 0.21f * t2, 1400f, t, [SwingEffects, SwingEffects], 76f, -15.2f);
 
                 if (timer > end)
                     isAttacking = false;
@@ -783,15 +902,15 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
 
                 if (timer < max)
                 {
-                    PrepareSwing(80f, PiOver2 + Player.direction * 0.5f, t, true, true, -12f);
+                    PrepareSwing(90f, PiOver2 + Player.direction * 0.5f, t, true, true, -12f);
                 }
 
                 if (timer > max && timer < max2)
                 {
-                    PrepareSwing(87f, PiOver2 + Player.direction * 0.6f, t, true, true, -12f);
+                    PrepareSwing(97f, PiOver2 + Player.direction * 0.6f, t, true, true, -12f);
                 }
 
-                EnactSwing(95f, max2, end, MiscArray[1] + 0.23f, 0.27f, 400f, t, [SwingEffectsHeavy, null], -1, -13.2f);
+                EnactSwing(108f, max2, end, MiscArray[1] + 0.23f, 0.27f, 400f, t, [SwingEffectsHeavy, null], -1, -13.2f);
 
                 if (timer > end)
                     isAttacking = false;
@@ -824,14 +943,188 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
 
                 CreateDust(DustID.GemAmethyst, vel, pos, default, Main.rand.NextFloat(0.34f, 1f));
 
-                CreateDust(DustType<PurpurineDust>(), vel * Main.rand.NextFloat(1.5f, 4f), pos, default, Main.rand.NextFloat(0.34f, 1f));
+                CreateDust(DustType<PurpurineDust>(), vel * Main.rand.NextFloat(1.5f, 4f), pos, default, Main.rand.NextFloat(0.64f, 1f));
             }
+
+            for (int i = 0; i < 8; i++) //this could be good or bad
+            {
+                Vector2 pos = n.Center + Main.rand.NextVector2Circular(n.width / 2f, n.height / 2f);
+                Vector2 vel = new Vector2(mainVec.X / 100f * -Projectile.direction, mainVec.Y / 100f * -Projectile.direction).RotatedBy(Projectile.rotation) * (info.Crit ? 15f : 8.35f);
+
+                //var d = CreateDust(DustType<StarryStretchyGlow>(), (vel * Main.rand.NextFloat(1.5f, 4f)).RotatedByRandom(Pi * 0.3f), pos, Color.White, Main.rand.NextFloat(1.9f, 3f));
+                //d.customData = new Vector2(1f, Main.rand.NextFloat(0.4f, 0.6f));
+            }
+
+            if (!HitNPC && attackType == 3)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    float angleD = Main.rand.NextFloat(TwoPi);
+                    Vector2 posD = n.Center - angleD.ToRotationVector2() * Main.rand.NextFloat(10f, 15f);
+                    Vector2 velD = angleD.ToRotationVector2() * Main.rand.NextFloat(14f, 18f);
+
+                    Projectile.NewProjectileDirect(Projectile.InheritSource(Projectile), posD, velD, ProjectileType<EstrellaSlashProj>(), (Projectile.damage / 2), 0f, Projectile.owner, 0f, -0.2f, 0f);
+                }
+
+                HitNPC = true;
+            }
+
+            SoundEngine.PlaySound(new SoundStyle("MythosOfMoonlight/Assets/Sounds/estrellaImpact") { PitchVariance = 0.3f, MaxInstances = 3 }, Projectile.Center);
+            //Projectile.NewProjectile(Projectile.GetSource_FromThis(), n.Center + Main.rand.NextVector2Circular(n.width / 2, n.height / 2), Helper.FromAToB(Projectile.Center, n.Center), ModContent.ProjectileType<EstrellaPImpact>(), 0, 0, Projectile.owner, n.whoAmI);
+            //Projectile.NewProjectile(Projectile.GetSource_FromThis(), n.Center - Vector2.UnitY * 700, Helper.FromAToB(n.Center - Vector2.UnitY * 500, n.Center) * Main.rand.NextFloat(4, 8f), ModContent.ProjectileType<EstrellaP2>(), Projectile.damage, 0, Projectile.owner, n.whoAmI);
+
+            SpawnProjectle(Player, ProjectileType<EstrellaP2>(), n.Center - Vector2.UnitY * 700, Helper.FromAToB(n.Center - Vector2.UnitY * 500, n.Center) * Main.rand.NextFloat(4, 8f), Projectile.damage * 0.6f, 7f, Player.ownedProjectileCounts[ProjectileType<EstrellaP2>()] < 3, n.whoAmI);
+
+            ApplyScreenshake(n.Center, (attackType == 3) ? 20f : 8f, 2f, 500f, 10);
         }
 
         public override void SafeModifyHitNPC(NPC n, ref NPC.HitModifiers hitMods)
         {
             Strike = 1;
             hitMods.DefenseEffectiveness *= 0.25f;
+        }
+
+        public static int Strike = 0;
+
+        public override void Load()
+        {
+            On_CombatText.NewText_Rectangle_Color_string_bool_bool += CombatText_NewText_Rectangle_Color_string_bool_bool;
+        }
+
+        //when you deal damage the color is changed to a new one!@!e32q342
+        private int CombatText_NewText_Rectangle_Color_string_bool_bool(On_CombatText.orig_NewText_Rectangle_Color_string_bool_bool orig, Rectangle location, Color color, string text, bool dramatic, bool dot)
+        {
+            if (Strike > 0)
+            {
+                color = Color.Lerp(Color.Violet, Color.Purple, 0.3f);
+                Strike--;
+            }
+
+            return orig(location, color, text, dramatic, dot);
+        }
+
+        public override void Unload()
+        {
+            On_CombatText.NewText_Rectangle_Color_string_bool_bool -= CombatText_NewText_Rectangle_Color_string_bool_bool;
+        }
+    }
+
+    class EstrellaSlashProj : ModProjectile
+    {
+        private float yscale = 0.6f;
+
+        public override string Texture => TryGetTextureFromOther<Estrella>();
+
+        public override void SetDefaults()
+        {
+            Projectile.width = 6;
+            Projectile.height = 20;
+            Projectile.aiStyle = -1;
+            Projectile.timeLeft = 16;
+            Projectile.tileCollide = false;
+            Projectile.scale = 0.238f;
+            Projectile.alpha = 30;
+            Projectile.hostile = false;
+            Projectile.friendly = true;
+            Projectile.penetrate = -1;
+            Projectile.ignoreWater = true;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = -1;
+        }
+
+        public override void AI()
+        {
+            Projectile.rotation = Utils.ToRotation(Projectile.velocity) + (float)Math.PI / 2f;
+
+            Projectile.scale = 0.4f;
+
+            if (Projectile.timeLeft > 8)
+                yscale += 0.6f;
+
+            else
+            {
+                yscale -= 1f;
+                Projectile.alpha += 10;
+            }
+
+            Projectile.velocity *= 0.7f;
+
+            //needs tweaking: make dust stick closer together!!!!
+
+            Dust d = Dust.NewDustDirect(Projectile.Center + Projectile.velocity * Main.rand.NextFloatDirection(), 0, 0, DustType<Starry2>());
+            d.velocity = Projectile.velocity * -1f * 0.43f * 1.2f;
+           // d.velocity = d.velocity.RotatedBy(PiOver2);
+            d.color = Color.White;
+            d.noGravity = true;
+            d.scale = 0.2f * Projectile.scale;
+
+            Dust d2 = Dust.NewDustDirect(Projectile.Center + Projectile.velocity * Main.rand.NextFloatDirection(), 0, 0, DustType<Starry2>());
+            d2.velocity = Projectile.velocity * 1f * 0.43f * 1.2f;
+           // d.velocity = d.velocity.RotatedBy(PiOver2);
+            d2.color = Color.White;
+            d2.noGravity = true;
+            d2.scale = 0.2f * Projectile.scale;
+
+            Dust d3 = Dust.NewDustDirect(Projectile.Center + Projectile.velocity * Main.rand.NextFloatDirection(), 0, 0, DustType<Starry2>());
+            d3.velocity = Projectile.velocity * Main.rand.NextFloatDirection() * 0.3f;
+           // d.velocity = d.velocity.RotatedBy(PiOver2);
+            d3.color = Color.White;
+            d3.noGravity = true;
+            d3.scale = 0.226f * Projectile.scale;
+        }
+
+        public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
+        {
+            Strike = 1;
+        }
+
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            Projectile.damage = (int)(Projectile.damage * 0.8f);
+        }
+
+        //messy as HELL oh my GYATT
+        public override bool PreDraw(ref Color lightColor)
+        {
+            Texture2D tex = TextureAssets.Extra[98].Value;
+
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+
+            //outer, darker part
+            Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, Color.Violet /*with { A = 0 }*/, Projectile.rotation, Utils.Size(tex) / 2f, new Vector2(Projectile.scale * (Projectile.ai[0] == 1 ? 1.12f : 1.1f), yscale * (Projectile.ai[0] == 1 ? 1.12f : 1f)), 0, 0f);
+
+            //middle, brighter part
+            Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, Color.Lerp(Color.Purple, Color.White, 0.7f) /*with { A = 0 } */, Projectile.rotation, Utils.Size(tex) / 2f, new Vector2(Projectile.scale * 0.75f * (Projectile.ai[0] == 1 ? 1.1f : 1.05f), yscale * 0.75f * (Projectile.ai[0] == 1 ? 1.1f : 1f)), 0, 0f);
+
+            //inner, white part
+            Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, Color.White /*with { A = 0 } */, Projectile.rotation, Utils.Size(tex) / 2f, new Vector2(Projectile.scale * 0.45f * (Projectile.ai[0] == 1 ? 1.12f : 1.05f), yscale * 0.45f * (Projectile.ai[0] == 1 ? 1.12f : 1f)), 0, 0f);
+
+            VFXManager.DrawCache.Add(() =>
+            {
+                //middle, brighter part
+                Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, Color.Lerp(Color.Purple, Color.White, 0.7f) /*with { A = 0 } */, Projectile.rotation, Utils.Size(tex) / 2f, new Vector2(Projectile.scale * 0.75f * (Projectile.ai[0] == 1 ? 1.1f : 1.05f), yscale * 0.75f * (Projectile.ai[0] == 1 ? 1.1f : 1f)), 0, 0f);
+
+                //inner, white part
+                //Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, Color.White /*with { A = 0 } */, Projectile.rotation, Utils.Size(tex) / 2f, new Vector2(Projectile.scale * 0.45f * (Projectile.ai[0] == 1 ? 1.12f : 1.05f), yscale * 0.45f * (Projectile.ai[0] == 1 ? 1.12f : 1f)), 0, 0f);
+            });
+
+            MythosOfMoonlight.StarryDrawCache.Add(() =>
+            {
+                Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, Color.Lerp(Color.Purple, Color.White, 0.7f) /*with { A = 0 } */, Projectile.rotation, Utils.Size(tex) / 2f, new Vector2(Projectile.scale * 0.75f * (Projectile.ai[0] == 1 ? 1.1f : 1.05f), yscale * 0.75f * (Projectile.ai[0] == 1 ? 1.1f : 1f)), 0, 0f);
+            });
+
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+
+            return false;
+        }
+
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+            float point = 0f;
+            Vector2 vec = NormalizeBetter(Projectile.velocity) * (float)Projectile.height * yscale;
+            return Collision.CheckAABBvLineCollision(Utils.TopLeft(targetHitbox), Utils.Size(targetHitbox), Projectile.Center - vec, Projectile.Center + vec, (float)Projectile.width * Projectile.scale * 2f, ref point);
         }
 
         public static int Strike = 0;

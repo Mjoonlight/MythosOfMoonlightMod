@@ -316,6 +316,11 @@ Mods: {
 				Tooltip: A small call to the stars
 			}
 
+			EstrellaR: {
+				DisplayName: Estrella R
+				Tooltip: ""
+			}
+
 			RustyWaraxe: {
 				DisplayName: Rusty Waraxe
 				Tooltip: Barely sharp enough to occasionally cut deep wounds
@@ -433,11 +438,6 @@ Mods: {
 
 			StarWhip: {
 				DisplayName: Star Whip
-				Tooltip: ""
-			}
-
-			EstrellaR: {
-				DisplayName: Estrella R
 				Tooltip: ""
 			}
 		}
@@ -576,6 +576,7 @@ Mods: {
 			PurpurineSaberProj.DisplayName: Purpurine Saber Proj
 			CrawshotProj.DisplayName: Crawshot Proj
 			EstrellaProj2.DisplayName: Estrella Proj2
+			EstrellaSlashProj.DisplayName: Estrella Slash Proj
 		}
 
 		NPCs: {

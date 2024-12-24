@@ -506,12 +506,20 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                 }
             }
 
+            //this is the slash wave from the saber
+
             draweththeetrail();
 
             VFXManager.DrawCache.Add(() =>
             {
                 draweththeetrail();
                // Draw(1.2f, 1f, 1f);
+            });
+
+            MythosOfMoonlight.StarryDrawCache.Add(() =>
+            {
+                draweththeetrail();
+                // Draw(1.2f, 1f, 1f);
             });
 
             Draw(1f, 1f, 1f);

@@ -146,6 +146,11 @@ namespace MythosOfMoonlight.Common.Utilities
             return d; //returns the dust so you can freely modify it afterwards if needed
         }
 
+        public static Projectile SpawnProjectle(Player owner, int type, Vector2 pos, Vector2 vel, float damage, float knockBack, bool condition = true, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f)
+        {
+            return condition ? Projectile.NewProjectileDirect(owner.GetSource_FromThis(), pos, vel, type, (int)damage, knockBack, owner.whoAmI, ai0, ai1, ai2) : null;
+        }
+
         public static Color PickRandom(Color[] options) => options[Main.rand.Next(options.Length)];
 
         public static void DrawSimpleTrail(this Projectile Projectile, Texture2D texture, Vector2 scale, Color startColor, Color endColor, float extraRot = 0f)
@@ -227,6 +232,19 @@ namespace MythosOfMoonlight.Common.Utilities
             settings.Owner.itemRotation = (Projectile.velocity * Projectile.direction).ToRotation();
         }
 
+        public static Vector2 ClosestPointInHitbox(Rectangle hitboxOfTarget, Vector2 desiredLocation)
+        {
+            Vector2 offset = desiredLocation - hitboxOfTarget.Center.ToVector2();
+            offset.X = Math.Min(Math.Abs(offset.X), hitboxOfTarget.Width / 2) * Math.Sign(offset.X);
+            offset.Y = Math.Min(Math.Abs(offset.Y), hitboxOfTarget.Height / 2) * Math.Sign(offset.Y);
+            return hitboxOfTarget.Center.ToVector2() + offset;
+        }
+
+        public static Vector2 ClosestPointInHitbox(Entity entity, Vector2 desiredLocation)
+        {
+            return ClosestPointInHitbox(entity.Hitbox, desiredLocation);
+        }
+
         public static bool ConsumeAmmo(Item heldItem, Player player, out int AmmoItemTypeFound, out int damage, int amount = 1, bool consume = true, int overrideAmmoItemType = -69420)
         {
             bool validAmmoFound = false;
@@ -252,15 +270,16 @@ namespace MythosOfMoonlight.Common.Utilities
                                 if (consume)
                                     item.stack -= amount;
 
+                                AmmoItemTypeFound = item.shoot;
+                                damage = item.damage;
+                                validAmmoFound = true;
+
                                 if (item.stack <= 0)
                                 {
                                     item.active = false;
                                     item.TurnToAir();
                                 }
 
-                                AmmoItemTypeFound = item.shoot;
-                                damage = item.damage;
-                                validAmmoFound = true;
                                 break;
                             }
 

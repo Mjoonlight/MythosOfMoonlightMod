@@ -646,13 +646,14 @@ namespace MythosOfMoonlight
                 gd.Clear(Color.Transparent);
                 sb.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
 
+                Starry2.DrawAll(Main.spriteBatch);
+                Starry.DrawAll(Main.spriteBatch);
+                StarryStretchyGlow.DrawAllWithStarryEffect(Main.spriteBatch);
+
                 foreach (Action drawAction in StarryDrawCache)
                 {
                     drawAction?.Invoke(); //anything can be drawn using the magic
                 }
-
-                Starry2.DrawAll(Main.spriteBatch);
-                Starry.DrawAll(Main.spriteBatch);
 
                 StarryDrawCache?.Clear();
 
@@ -691,10 +692,12 @@ namespace MythosOfMoonlight
                 RTOutline.Parameters["colStart"].SetValue(Color.Black.ToVector4());
                 RTOutline.Parameters["useMainAlpha"].SetValue(false);
                 RTOutline.Parameters["offset"].SetValue(new Vector2(Main.GlobalTimeWrappedHourly * 0.1f, 0));
+
                 sb.Draw(render[0], Vector2.Zero, Color.White);
 
-                gd.Textures[1] = Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/jungleDustColor", (AssetRequestMode)1).Value;
+                gd.Textures[1] = Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/jungleDustColor", AssetRequestMode.ImmediateLoad).Value;
                 metaballGradient.CurrentTechnique.Passes[0].Apply();
+
                 sb.Draw(render[1], Vector2.Zero, Color.White);
 
                 gd.Textures[1] = Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Gradients/coldwindGradient", (AssetRequestMode)1).Value;
@@ -865,6 +868,7 @@ namespace MythosOfMoonlight
             public float Scale;
             public bool Fade;
         }
+
         Particle[] particles;
         /*public override void OnDeselected()
         {

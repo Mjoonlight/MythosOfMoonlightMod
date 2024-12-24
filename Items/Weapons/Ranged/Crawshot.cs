@@ -165,7 +165,7 @@ namespace MythosOfMoonlight.Items.Weapons.Ranged
         private Texture2D cannon1, cannon2, cannon3;
         private Texture2D cannon1W, cannon2W, cannon3W;
 
-        public float FiringOrder = 0;
+        public int FiringOrder = -1;
 
         public bool die = false;
 
@@ -202,7 +202,7 @@ namespace MythosOfMoonlight.Items.Weapons.Ranged
             if (Projectile.owner != Main.myPlayer)
                 return;
 
-            if (Owner.dead || !Owner.active || Owner.noItems || Owner.CCed)
+            if (Owner.dead || !Owner.active || Owner.noItems || Owner.CCed || !ConsumeAmmo(Owner.HeldItem, Owner, out int i22, out int e22, 1, false))
                 Projectile.Kill();
 
             Projectile.damage = Owner.GetWeaponDamage(Owner.HeldItem);
@@ -231,13 +231,18 @@ namespace MythosOfMoonlight.Items.Weapons.Ranged
 
                 if(++Time >= TimeToFire + 1)
                 {
-                    int index = (int)FiringOrder;
+                    int index = ++FiringOrder;
 
                     Vector2 pos = tipPositions[index];
                     Vector2 vel = pos.DirectionTo(Main.MouseWorld);
 
-                    if (!ConsumeAmmo(Owner.HeldItem, Owner, out int teAmo, out int ammoDmg, 1, true))
+                    if (!ConsumeAmmo(Owner.HeldItem, Owner, out int to, out int the, 1, true))
+                    {
                         die = true;
+                        return;
+                    }
+
+                    ConsumeAmmo(Owner.HeldItem, Owner, out int teAmo, out int ammoDmg, 1, false);
 
                     SoundEngine.PlaySound(SoundID.Item40 with { Pitch = -0.3f, Volume = 0.8f }, pos);
                     SoundEngine.PlaySound(SoundID.Item42 with { Pitch = -0.2f, Volume = 0.45f }, pos);
@@ -261,10 +266,10 @@ namespace MythosOfMoonlight.Items.Weapons.Ranged
 
                     CannonJustFiredAndIsCooling[index] = true;
 
-                    if (++FiringOrder > 2)
-                        FiringOrder = 0;
-
                     Time = 0f;
+
+                    if (FiringOrder >= 2) //why does it randomly choose to go above 2
+                        FiringOrder = -1;
                 }
             }
 
