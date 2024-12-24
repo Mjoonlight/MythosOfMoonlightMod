@@ -962,8 +962,9 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
                     float angleD = Main.rand.NextFloat(TwoPi);
                     Vector2 posD = n.Center - angleD.ToRotationVector2() * Main.rand.NextFloat(10f, 15f);
                     Vector2 velD = angleD.ToRotationVector2() * Main.rand.NextFloat(14f, 18f);
+                    Vector2 velD2 = (angleD + PiOver2).ToRotationVector2() * Main.rand.NextFloat(14f, 18f);
 
-                    Projectile.NewProjectileDirect(Projectile.InheritSource(Projectile), posD, velD, ProjectileType<EstrellaSlashProj>(), (Projectile.damage / 2), 0f, Projectile.owner, 0f, -0.2f, 0f);
+                    Projectile.NewProjectileDirect(Projectile.InheritSource(Projectile), posD, i == 0 ? velD : velD2, ProjectileType<EstrellaSlashProj>(), (Projectile.damage / 2), 0f, Projectile.owner, 0f, -0.2f, 0f);
                 }
 
                 HitNPC = true;

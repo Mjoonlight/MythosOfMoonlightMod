@@ -146,6 +146,12 @@ namespace MythosOfMoonlight.Common.Utilities
             return d; //returns the dust so you can freely modify it afterwards if needed
         }
 
+        public static void Clear(this float[] f)
+        {
+            for (int index = 0; index < f.Length; index++)
+                f[index] = 0f;
+        }
+
         public static Projectile SpawnProjectle(Player owner, int type, Vector2 pos, Vector2 vel, float damage, float knockBack, bool condition = true, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f)
         {
             return condition ? Projectile.NewProjectileDirect(owner.GetSource_FromThis(), pos, vel, type, (int)damage, knockBack, owner.whoAmI, ai0, ai1, ai2) : null;
