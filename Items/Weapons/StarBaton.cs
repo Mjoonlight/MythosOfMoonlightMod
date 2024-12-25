@@ -54,7 +54,7 @@ namespace MythosOfMoonlight.Items.Weapons
 
         public override void SafeSetDefaults()
         {
-            maxAttackType = 1; //up, down?
+            maxAttackType = 1; 
             shaderType = 0;
             trailLength = 21;
             disFromPlayer = 5;

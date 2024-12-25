@@ -14,6 +14,7 @@ using MythosOfMoonlight.Common.Crossmod;
 using MythosOfMoonlight.Common.Globals;
 using MythosOfMoonlight.Common.Utilities;
 using System.Collections.Generic;
+using MythosOfMoonlight.Assets.Effects;
 
 namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 {
@@ -100,6 +101,8 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
         public override bool? CanDamage() => false;
 
         public Vector2 tipPosition = Vector2.Zero;
+
+        float mult = 1f;
 
         public override void AI()
         {
@@ -235,11 +238,9 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 
                     if (percent >= 0.666f && percent < 1f) // 2 blasts
                     {
-                        float mult = 1f;
-
                         if (FireCheck == 0f || FireCheck == 18f)
                         {
-                            SpawnProjectle(Owner, ProjectileType<IrisStar>(), tipPosition + projVel * 1.75f, projVel * 3f, Projectile.damage, 3f);
+                            SpawnProjectle(Owner, ProjectileType<MOCIrisProj3>(), tipPosition + projVel * 1.75f, projVel * 3f, Projectile.damage, 3f);
 
                             for (int i = 0; i < 8 + (1 + (FireCheck / 30f)); i++)
                             {
@@ -265,11 +266,9 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 
                     if (percent >= 1f) // 3 blasts
                     {
-                        float mult = 1f;
-
                         if (FireCheck == 0f || FireCheck == 18f || FireCheck == 36f)
                         {
-                            SpawnProjectle(Owner, ProjectileType<IrisStar>(), tipPosition + projVel * 1.75f, projVel * 3f, Projectile.damage, 3f);
+                            SpawnProjectle(Owner, ProjectileType<MOCIrisProj3>(), tipPosition + projVel * 1.75f, projVel * 3f, Projectile.damage, 3f);
 
                             for (int i = 0; i < 8 + (1 + (FireCheck / 30f)); i++)
                             {
@@ -280,7 +279,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                                 CreateDust(DustType<PurpurineDust>(), dvel * 0.5f, dPos, Color.White, Main.rand.NextFloat(0.8f, 1.2f) * 1.5f);
                             }
 
-                            mult = Main.rand.NextFloat(0.9f, 1.2f);
+                            mult += 0.2f;
                         }
 
                         if (FireCheck < 9f || (FireCheck > 18f && FireCheck < 27f) || FireCheck > 36f)
@@ -347,8 +346,8 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 
         public override void SetDefaults()
         {
-            Projectile.width = 18;
-            Projectile.height = 18;
+            Projectile.width = 5;
+            Projectile.height = 5;
             Projectile.friendly = true;
             Projectile.penetrate = 1;
             Projectile.tileCollide = true;
@@ -356,16 +355,41 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
             Projectile.timeLeft = 300;
             Projectile.netUpdate = true;
             Projectile.netImportant = true;
+
+            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 10;
+            ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
+        }
+
+        Color ColorFunction(float t)
+        {
+            return Color.Lerp(Color.Lerp(Color.Purple, Color.White, 0.2f), Color.Lerp(Color.Purple, Color.Violet, 0.6f), t);
+        }
+
+        float WidthFunction(float t)
+        {
+            return Lerp(20f, 10f, 1f - t);
         }
 
         public override bool PreDraw(ref Color lightColor)
         {
             trail ??= Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/slash").Value;
 
+            if (Projectile.timeLeft < 298)
+            {
+                Trail.DrawTrail(Projectile, 1f, -104f, ColorFunction, WidthFunction);
+                Trail.DrawTrail(Projectile, 1f, 104f, ColorFunction, WidthFunction);
+
+                VFXManager.DrawCache.Add(() =>
+                {
+                    Trail.DrawTrail(Projectile, 1f, -104f, ColorFunction, WidthFunction);
+                    Trail.DrawTrail(Projectile, 1f, 104f, ColorFunction, WidthFunction);
+                });
+            }
+
             Main.spriteBatch.Reload(BlendState.Additive);
 
-            Projectile.DrawTrail(TextureAssets.Extra[98], new Vector2(1.2f, 0.3f), Color.Violet, Color.Purple, 0f, 0.25f, 0.1f);
-            Projectile.DrawTrail(TextureAssets.Extra[98], new Vector2(1.2f, 0.3f), Color.Red, Color.BurlyWood, 0f, 0.25f, 0.1f);
+           // Projectile.DrawTrail(TextureAssets.Extra[98], new Vector2(1.2f, 0.3f), Color.Violet, Color.Purple, 0f, 0.25f, 0.1f);
+           //Projectile.DrawTrail(TextureAssets.Extra[98], new Vector2(1.2f, 0.3f), Color.Red, Color.BurlyWood, 0f, 0.25f, 0.1f);
 
             return false;
         }
@@ -374,8 +398,10 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
         {
             Projectile.rotation = Projectile.velocity.ToRotation();
 
-           // if (Projectile.timeLeft < 280f)
-               // Projectile.GetGlobalProjectile<MoMGlobalProj>().HomingActions(Projectile, .125f, 20f, 300f);
+            if (Projectile.timeLeft < 290f)
+                Projectile.GetGlobalProjectile<MoMGlobalProj>().HomingActions(Projectile, .135f + (++Projectile.localAI[0] / 100f), 25f, 500f);
+            
+            else Projectile.velocity *= 0.998f;
         }
 
         public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)

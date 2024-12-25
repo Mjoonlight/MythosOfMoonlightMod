@@ -325,14 +325,13 @@ Mods: {
 			RustyWaraxe: {
 				DisplayName: Rusty Waraxe
 				Tooltip: Barely sharp enough to occasionally cut deep wounds
-
 			}
-			
+
 			SoulCandle: {
 				DisplayName: Soul Candle
 				Tooltip: ""
 			}
-			
+
 			TownNPCMood: {
 				Content: I am content.
 				NoHome: I hate not having a home.
@@ -375,24 +374,24 @@ Mods: {
 
 			WardingStar: {
 				DisplayName: Warding Stars
-				Tooltip: 
-				'''
-				A pair of stars that resonate with eachother very closely.
-				Hold down to charge up a starry blast of energy.
-				'''
+				Tooltip:
+					'''
+					A pair of stars that resonate with eachother very closely.
+					Hold down to charge up a starry blast of energy.
+					'''
 			}
 
 			StarBaton: {
 				DisplayName: Star Baton
-				Tooltip: 
-				'''
-				A baton powered by the night sky.
-				Spin and charge up energy to fling the baton towards the mouse.
-				If you catch it on its way back, held damage increaes by 2.6% and thrown damage increases by 8%.
-				This can stack up to 33% and 100% extra damage, respectively.
-				[c/ffcc35:Let go of left click once charged to fling the baton.]
-				[c/ffcc35:Press and hold left before it returns to catch it.]
-				'''
+				Tooltip:
+					'''
+					A baton powered by the night sky.
+					Spin and charge up energy to fling the baton towards the mouse.
+					If you catch it on its way back, held damage increaes by 2.6% and thrown damage increases by 8%.
+					This can stack up to 33% and 100% extra damage, respectively.
+					[c/ffcc35:Let go of left click once charged to fling the baton.]
+					[c/ffcc35:Press and hold left before it returns to catch it.]
+					'''
 			}
 
 			BlinkrootI: {
@@ -412,7 +411,7 @@ Mods: {
 
 			Kristellation: {
 				DisplayName: Kristellation
-				Tooltip: "pingas"
+				Tooltip: pingas
 			}
 
 			Starcaller: {
