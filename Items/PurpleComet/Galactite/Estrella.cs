@@ -970,16 +970,16 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
                 HitNPC = true;
             }
 
-            SoundEngine.PlaySound(new SoundStyle("MythosOfMoonlight/Assets/Sounds/estrellaImpact") { PitchVariance = 0.3f, MaxInstances = 3 }, Projectile.Center);
-            //Projectile.NewProjectile(Projectile.GetSource_FromThis(), n.Center + Main.rand.NextVector2Circular(n.width / 2, n.height / 2), Helper.FromAToB(Projectile.Center, n.Center), ModContent.ProjectileType<EstrellaPImpact>(), 0, 0, Projectile.owner, n.whoAmI);
-            //Projectile.NewProjectile(Projectile.GetSource_FromThis(), n.Center - Vector2.UnitY * 700, Helper.FromAToB(n.Center - Vector2.UnitY * 500, n.Center) * Main.rand.NextFloat(4, 8f), ModContent.ProjectileType<EstrellaP2>(), Projectile.damage, 0, Projectile.owner, n.whoAmI);
+            if (Player.ownedProjectileCounts[ProjectileType<EstrellaP2>()] < 3 && n.type != NPCID.TargetDummy && !n.CountsAsACritter)
+            {
 
-            SpawnProjectle(Player, ProjectileType<EstrellaP2>(), n.Center - Vector2.UnitY * 700, Helper.FromAToB(n.Center - Vector2.UnitY * 500, n.Center) * Main.rand.NextFloat(4, 8f), Projectile.damage * 0.6f, 7f, Player.ownedProjectileCounts[ProjectileType<EstrellaP2>()] < 3, n.whoAmI);
-
+                SoundEngine.PlaySound(new SoundStyle("MythosOfMoonlight/Assets/Sounds/estrellaImpact") { PitchVariance = 0.3f, MaxInstances = 3 }, Projectile.Center);
+                SpawnProjectle(Player, ProjectileType<EstrellaP2>(), n.Center - Vector2.UnitY * 700, Helper.FromAToB(n.Center - Vector2.UnitY * 500, n.Center) * Main.rand.NextFloat(4, 8f), Projectile.damage * 0.6f, 7f, Player.ownedProjectileCounts[ProjectileType<EstrellaP2>()] < 3, n.whoAmI);
+            }
             ApplyScreenshake(n.Center, (attackType == 3) ? 20f : 8f, 2f, 500f, 10);
         }
 
-        public override void SafeModifyHitNPC(NPC n, ref NPC.HitModifiers hitMods)
+        public override void SafeModifyHitNPC(NPC n, ref NPC.HitModifiers hitMods) 
         {
             Strike = 1;
             hitMods.DefenseEffectiveness *= 0.25f;

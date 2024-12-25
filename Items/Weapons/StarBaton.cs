@@ -11,6 +11,7 @@ using MythosOfMoonlight.Common.Systems;
 using MythosOfMoonlight.Common.Base;
 using MythosOfMoonlight.Items.PurpleComet.Galactite;
 using System.Threading;
+using Terraria.WorldBuilding;
 
 namespace MythosOfMoonlight.Items.Weapons
 {
@@ -161,6 +162,8 @@ namespace MythosOfMoonlight.Items.Weapons
             Player.GetModPlayer<SwordPlayer>().isUsingMeleeProj = false;
         }
 
+        float dmgBoostWhenOut = 0.2f;
+
         public override void AI()
         {
             if (Player.dead || !Player.active || Player.CCed || Player.noItems)
@@ -191,7 +194,7 @@ namespace MythosOfMoonlight.Items.Weapons
             if (attackType == 0)
             {
                 if (timer <= 40f)
-                    PrepareSwing(60f, PiOver2 + Player.direction * 0.5f, 1f, true, true, -12f, 1f);
+                    PrepareSwing(36f, PiOver2 + Player.direction * 0.5f, 1f, true, true, -12f, 1f);
      
                 if (timer > 40)
                 {
@@ -204,14 +207,14 @@ namespace MythosOfMoonlight.Items.Weapons
                                 AttackSound(SwingSound);
                                 //ApplyScreenshake(Projectile.Center, .4f, 2f, 250f, 4);
                                 ResetProjectileDamage();
-                                //ModifyProjectileDamage(.15f);
+                                ModifyProjectileDamage(dmgBoostWhenOut / 3f);
                                 MiscArray[8] = 0;
                             }
 
                             isAttacking = true;
 
                             Projectile.rotation += 0.12f * Projectile.spriteDirection;
-                            mainVec = Projectile.rotation.ToRotationVector2() * 50f;
+                            mainVec = Projectile.rotation.ToRotationVector2() * 30f;
 
                             Player.direction = Projectile.direction;
                         }
@@ -220,15 +223,28 @@ namespace MythosOfMoonlight.Items.Weapons
 
                         if (MiscArray[10] == 200f)
                         {
+                            for (int i = 0; i < 40; i++)
+                            {
+                                float rotation = TwoPi * i / 40;
 
+                                Vector2 vel = rotation.ToRotationVector2() * ((i % 3 == 0) ? 0.5f : 1.5f);
+
+                                Vector2 pos = Player.Center + vel * 15f;
+
+                                CreateDust(DustID.YellowStarDust, (vel * 2.5f).RotatedBy(Sin(vel.X)), pos, default);
+                            }
+
+                            SoundEngine.PlaySound(SoundID.NPCHit5 with { Pitch = -0.23f, Volume = 0.6f }, Player.Center);
                         }
                     }
+
+                    //todo: make it decelerate and then return rather than instantly return!!!
 
                     if (!Player.controlUseItem || MiscArray[6] == 1) //fly out and return now
                     {
                         if (MiscArray[6] == 0)
                         {
-                            Vector2 tMouse = NormalizeBetter(Projectile.DirectionTo(Main.MouseWorld)) * 10f;
+                            Vector2 tMouse = NormalizeBetter(Projectile.DirectionTo(Main.MouseWorld)) * 7f;
 
                             MiscArray[3] = tMouse.X;
                             MiscArray[4] = tMouse.Y;
@@ -236,14 +252,14 @@ namespace MythosOfMoonlight.Items.Weapons
 
                         MiscArray[6] = 1;
 
-                        if (MiscArray[10] < 200f)
+                        if (MiscArray[10] < 200f) //fixed!!!!!
                             End();
 
                         if (++MiscArray[8] >= 30)
                         {
                             AttackSound(SwingSound);
                             ResetProjectileDamage();
-                            ModifyProjectileDamage(.15f);
+                            ModifyProjectileDamage(dmgBoostWhenOut, 1f);
                             MiscArray[8] = 0;
                         }
 
@@ -258,16 +274,21 @@ namespace MythosOfMoonlight.Items.Weapons
                         useTrail = true;
 
                         Projectile.rotation += 0.16f * Projectile.spriteDirection;
-                        mainVec = Projectile.rotation.ToRotationVector2() * 50f;
+                        mainVec = Projectile.rotation.ToRotationVector2() * 30f;
 
                         if (Projectile.Distance(Player.Center) > 2000f)
                             End();
 
-                        if (++MiscArray[7] >= 130)
+                        if (MiscArray[7] >= 63f && MiscArray[7] <= 80f) //slow down before returning
+                        {
+                            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.Zero, 0.12f);
+                        }
+
+                        if (++MiscArray[7] > 80) //return
                         {
                             if (MiscArray[11] == 0f)
                             {
-                                Vector2 toPlayer = NormalizeBetter(Projectile.DirectionTo(Player.Center)) * 11f;
+                                Vector2 toPlayer = NormalizeBetter(Projectile.DirectionTo(Player.Center)) * 7.5f;
                                 MiscArray[3] = toPlayer.X;
                                 MiscArray[4] = toPlayer.Y;
 
@@ -278,7 +299,20 @@ namespace MythosOfMoonlight.Items.Weapons
                                 if (Player.controlUseItem)
                                 {
                                     MiscArray.Clear();
-                                    timer = 0;
+                                    timer = 30;
+                                    Projectile.velocity = Vector2.Zero;
+                                    dmgBoostWhenOut += 0.08f;
+
+                                    for (int i = 0; i < 30; i++)
+                                    {
+                                        float rotation = TwoPi * i / 30;
+
+                                        Vector2 vel = rotation.ToRotationVector2() * ((i % 3 == 0) ? 0.5f : 1.5f);
+
+                                        Vector2 pos = Player.Center + vel * 15f;
+
+                                        CreateDust(DustID.YellowStarDust, (vel * 2.5f).RotatedBy(Sin(vel.X)), pos, default);
+                                    }
                                 }
 
                                 else End();
@@ -317,12 +351,16 @@ namespace MythosOfMoonlight.Items.Weapons
 
                 Vector2 vel = Player.velocity + mainVec / 200f;
 
-                CreateDust(DustID.YellowStarDust, vel, pos1, default);
-                CreateDust(DustID.YellowStarDust, vel, pos2, default);
+                //Color dustColor = Color.Lerp(Color.Blue, Color.LightYellow, MiscArray[10] / 200f);
+
+                int dustType = ((MiscArray[10] / 200f) >= 1f) ? DustID.YellowStarDust : DustID.GemSapphire;
+
+                CreateDust(dustType, vel, pos1, default);
+                CreateDust(dustType, vel, pos2, default);
             }
         }
 
-        //account for the fact that the "center" has been shifted up a lot, and there are now 2 "blades" that can deal damage!!!!!!
+        //account for the fact that the "center" has been shifted up a lot, and there are now 2 parts that can deal damage!!!!!!
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
             if (isAttacking && Collision.CheckAABBvLineCollision2(targetHitbox.TopLeft(), targetHitbox.Size(), ProjCenter_WithoutGravDir + MainVec_WithoutGravDir * Projectile.scale * 0.11f, ProjCenter_WithoutGravDir + MainVec_WithoutGravDir * Projectile.scale))
@@ -336,13 +374,15 @@ namespace MythosOfMoonlight.Items.Weapons
 
         public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
         {
-            width = height = 10;
+            width = height = 4;
             return base.TileCollideStyle(ref width, ref height, ref fallThrough, ref hitboxCenterFrac);
         }
 
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            MiscArray[7] = 130f;
+            if (MiscArray[6] != 0f)
+                MiscArray[7] = 130f;
+
             return false;
         }
 
@@ -353,18 +393,23 @@ namespace MythosOfMoonlight.Items.Weapons
                 Vector2 pos = n.Center + Main.rand.NextVector2Circular(n.width / 2f, n.height / 2f);
                 Vector2 vel = Main.rand.NextVector2Circular(3f, 3f) * (info.Crit ? 1.45f : 0.835f);
 
-                CreateDust(DustID.YellowStarDust, vel, pos, default, Main.rand.NextFloat(0.34f, 1f));
+                CreateDust(DustID.YellowStarDust, vel, pos, default, Main.rand.NextFloat(1f, 1.6f));
 
-                CreateDust(DustID.Enchanted_Gold, vel * Main.rand.NextFloat(1.5f, 4f), pos, default, Main.rand.NextFloat(0.64f, 1f));
+                CreateDust(DustID.Enchanted_Gold, vel * Main.rand.NextFloat(1.5f, 4f), pos, default, Main.rand.NextFloat(0.9f, 1f));
             }
 
-            ApplyScreenshake(n.Center,  1.8f, 2f, 500f, 4);
+            ApplyScreenshake(n.Center, 0.95f, 1f, 200f, 3);
+
+            if (MiscArray[6] != 0f)
+                MiscArray[7] = 130f;
         }
 
         public override void SafeModifyHitNPC(NPC n, ref NPC.HitModifiers hitMods)
         {
             Strike = 1;
-            hitMods.DefenseEffectiveness *= 0.25f;
+
+            if (MiscArray[6] != 0f)
+                hitMods.DefenseEffectiveness *= 0.25f;
         }
 
         public static int Strike = 0;
@@ -391,193 +436,4 @@ namespace MythosOfMoonlight.Items.Weapons
             On_CombatText.NewText_Rectangle_Color_string_bool_bool -= CombatText_NewText_Rectangle_Color_string_bool_bool;
         }
     }
-
-    /*
-
-    public class StarBatonP : ModProjectile
-    {
-        public ref float Charge => ref Projectile.ai[0];
-
-        public ref float Mode => ref Projectile.ai[1];
-
-        public ref float SpinTimer => ref Projectile.ai[2];
-
-        public override string Texture => TryGetTextureFromOther<StarBaton>();
-
-        public override void SetStaticDefaults()
-        {
-            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 4;
-            ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
-        }
-
-        public override void SetDefaults()
-        {
-            Projectile.width = 50;
-            Projectile.height = 50;
-            Projectile.aiStyle = -1;
-            Projectile.friendly = true;
-            Projectile.penetrate = -1;
-            Projectile.tileCollide = false;
-            Projectile.ignoreWater = true;
-            Projectile.hide = true;
-            Projectile.ownerHitCheck = true;
-            Projectile.DamageType = DamageClass.Melee;
-            Projectile.alpha = 0;
-            Projectile.timeLeft = 45;
-            Projectile.netImportant = true;
-        }
-
-        Vector2 storedMousePos = Vector2.Zero;
-        float distance = 0f;
-        public override void AI()
-        {
-            Player player = Main.player[Projectile.owner];
-
-            if (player.dead || !player.active || player.ghost)
-            {
-                Projectile.Kill();
-                return;
-            }
-
-            if (Mode == 0f)
-            {
-                SpinTimer++;
-
-                if (SpinTimer % 21 == 0)
-                    SoundEngine.PlaySound(SoundID.DD2_MonkStaffSwing with { Volume = 0.4f }, Projectile.Center);
-
-                Vector2 ownerMountedCenter = player.RotatedRelativePoint(player.MountedCenter);
-
-                if (player.velocity.X != 0)
-                    player.ChangeDir(Math.Sign(player.velocity.X));
-
-                Projectile.direction = player.direction;
-
-                player.heldProj = Projectile.whoAmI;
-                player.itemTime = 2;
-                player.itemAnimation = 2;
-
-                //ramp up rotation speed
-                const float maxRotation = Pi / 6.85f / 1.5f;
-                float modifier = maxRotation * Math.Min(1f, SpinTimer / 80f);
-                Projectile.timeLeft = 10;
-
-                Projectile.numHits = 0;
-                Projectile.rotation = (float)Math.Atan2(Projectile.velocity.Y, Projectile.velocity.X);
-                Projectile.rotation += modifier * player.direction;
-                Projectile.velocity = Projectile.rotation.ToRotationVector2();
-                Projectile.position -= Projectile.velocity;
-
-                player.itemRotation = WrapAngle(Projectile.rotation);
-                Projectile.Center = ownerMountedCenter + new Vector2(7f * Projectile.direction, 5f);
-
-                if (SpinTimer >= 20)
-                {
-                    //dust when at a high enough velocity
-                    Vector2 pos = Projectile.Center + Projectile.velocity * (Projectile.width / 1.5f); //front
-                    Vector2 pos2 = Projectile.Center - Projectile.velocity * (Projectile.width / 1.5f); //bacc
-                    Dust d1 = Dust.NewDustDirect(pos, 0, 0, DustID.Enchanted_Pink);
-                    d1.color = Color.Lerp(Color.SkyBlue, Color.Violet, 0.75f + Main.rand.NextFloat(0.15f));
-                    d1.velocity = Projectile.rotation.ToRotationVector2() * 0.8f;
-                    d1.noGravity = true;
-                    d1.scale = 0.8f;
-
-                    Dust d2 = Dust.NewDustDirect(pos2, 0, 0, DustID.Enchanted_Gold);
-                    d2.color = Color.Lerp(Color.SkyBlue, Color.Violet, 0.75f + Main.rand.NextFloat(0.15f));
-                    d2.velocity = Projectile.rotation.ToRotationVector2() * 0.8f;
-                    d2.noGravity = true;
-                    d2.scale = 0.8f;
-                }
-
-                if (SpinTimer >= 200f && !player.controlUseItem)
-                {
-                    Projectile.velocity = Projectile.DirectionTo(Main.MouseWorld);
-                    distance = Clamp(distance, 100f, Projectile.Distance(Main.MouseWorld));
-                    Mode = 1f;
-                }
-
-                if(SpinTimer == 200f)
-                {
-                    Main.NewText("ready");
-                }
-
-                if (Projectile.owner == Main.myPlayer && !player.controlUseItem && SpinTimer < 190f)
-                {
-                    Projectile.Kill();
-                    return;
-                }
-            }
-
-            else
-            {
-                Main.NewText("guh");
-
-                Charge++;
-
-                float max = 200f;
-
-                Projectile.timeLeft = 10;
-                Projectile.velocity = NormalizeBetter(Projectile.velocity) * distance * Sin(Pi / max * Charge); //once  > 100 it should return
-
-                if (Charge >= 400f)
-                    Projectile.Kill();
-            }
-        }
-
-        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
-        {
-            
-        }
-
-        public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
-        {
-            modifiers.HitDirectionOverride = Math.Sign(target.Center.X - Main.player[Projectile.owner].Center.X);
-        }
-
-        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
-        {
-            return Projectile.Distance(ClosestPointInHitbox(targetHitbox, Projectile.Center)) <= Projectile.width / 2;
-        }
-
-        public override bool? CanHitNPC(NPC target)
-        {
-            if (!target.noTileCollide && !Collision.CanHitLine(Projectile.Center, 0, 0, target.Center, 0, 0))
-                return false;
-
-            return base.CanHitNPC(target);
-        }
-
-        public override bool PreDraw(ref Color lightColor)
-        {
-            Texture2D texture2D13 = TextureAssets.Projectile[Projectile.type].Value;
-            int num156 = TextureAssets.Projectile[Projectile.type].Value.Height / Main.projFrames[Projectile.type];
-            int y3 = num156 * Projectile.frame;
-            Rectangle rectangle = new Rectangle(0, y3, texture2D13.Width, num156);
-            Vector2 origin2 = rectangle.Size() / 2f;
-
-            //afterimages
-            Color color26 = lightColor;
-            color26 = Projectile.GetAlpha(color26);
-            for (int i = 0; i < ProjectileID.Sets.TrailCacheLength[Projectile.type]; i++)
-            {
-                Color color27 = color26 * 0.5f;
-                color27 *= (float)(ProjectileID.Sets.TrailCacheLength[Projectile.type] - i) / ProjectileID.Sets.TrailCacheLength[Projectile.type];
-                Vector2 value4 = Projectile.oldPos[i];
-                float num165 = Projectile.oldRot[i];
-                Main.EntitySpriteDraw(texture2D13, value4 + Projectile.Size / 2f - Main.screenPosition + new Vector2(0, Projectile.gfxOffY), new Microsoft.Xna.Framework.Rectangle?(rectangle), color27, num165, origin2, Projectile.scale, SpriteEffects.None, 0);
-            }
-
-            Projectile.SimpleDrawProjectile(Request<Texture2D>(Texture).Value, lightColor, false, 1f, 0f);
-            Projectile.SimpleDrawProjectile(Request<Texture2D>(Texture + "_Glow").Value, Color.LightYellow, true, 1f, 0f);
-
-            VFXManager.DrawCache.Add(() =>
-            {
-                Projectile.SimpleDrawProjectile(Request<Texture2D>(Texture + "_Glow").Value, Color.Lerp(Color.Transparent, Color.LightYellow, SpinTimer / 600f), true, 1f, 0f);
-            });
-
-            return false;
-        }
-    }
-
-    */
 }

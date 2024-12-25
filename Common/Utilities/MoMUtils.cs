@@ -212,6 +212,43 @@ namespace MythosOfMoonlight.Common.Utilities
             Main.EntitySpriteDraw(texture, drawPos + drawOffset, new Microsoft.Xna.Framework.Rectangle?(sourceRectangle), IsGlow ? Color : Projectile.GetAlpha(Color), Projectile.rotation + extraRot, origin, Projectile.scale * scaleMod, spriteEffects, 0);
         }
 
+        /// <summary>
+        /// Draws a trail behind the provided projectile.
+        /// </summary>
+        /// <param name="Projectile">proj to draw to</param>
+        /// <param name="texture">texture to use</param>
+        /// <param name="scale">scale of the trail: usually smal values * the projectile's scale work</param>
+        /// <param name="color">starting color</param>
+        /// <param name="endColor">ending color (at the end of the trail)</param>
+        /// <param name="extraRot">extra rotation that can be used to position the trail correctly</param>
+        /// <param name="inc">how much to increment over the projectile's trail length. smaller values = longer trails</param>
+        /// <param name="scaleEndLerpOverride">optional value that can be set as the minimum scale of the trailat the end. It lerps to 0 by default.</param>
+        public static void DrawTrail(this Projectile Projectile, Asset<Texture2D> texture, Vector2 scale, Color color, Color endColor, float extraRot = 0f, float inc = 0.4f, float scaleEndLerpOverride = 0f)
+        {
+            Texture2D afterimageTexture = texture.Value;
+
+            for (float i = 0; i < ProjectileID.Sets.TrailCacheLength[Projectile.type]; i += inc)
+            {
+                color *= Projectile.Opacity * 0.75f;
+
+                color *= (float)(ProjectileID.Sets.TrailCacheLength[Projectile.type] - i) / ProjectileID.Sets.TrailCacheLength[Projectile.type];
+
+                if ((int)i - 1 < 0)
+                    continue;
+
+                float rot = Projectile.oldRot[(int)i - 1] + extraRot;
+                Vector2 center = Vector2.Lerp(Projectile.oldPos[(int)i], Projectile.oldPos[(int)i - 1], 1 - i % 1);
+                center += Projectile.Size / 2f;
+
+                float scaleMult = Lerp(1f, scaleEndLerpOverride == 0 ? 0.2f : scaleEndLerpOverride, i / (float)ProjectileID.Sets.TrailCacheLength[Projectile.type]);
+
+                color = Color.Lerp(color, endColor, 1f - (i / (float)ProjectileID.Sets.TrailCacheLength[Projectile.type]));
+
+                Main.EntitySpriteDraw(afterimageTexture, center - Main.screenPosition + new Vector2(0, Projectile.gfxOffY), null, color, rot, afterimageTexture.Size() / 2f, scale * Projectile.scale * scaleMult, SpriteEffects.None, 0);
+            }
+        }
+
+
         public static void ManageHeldProj(this Projectile Projectile, Vector2 armPos, HeldprojSettings settings)
         {
             if (Main.myPlayer == Projectile.owner)

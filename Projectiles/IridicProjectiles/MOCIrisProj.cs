@@ -83,7 +83,7 @@ namespace MythosOfMoonlight.Projectiles.IridicProjectiles
             }
             for (int i = 0; i <= 20; i += 5)
             {
-                if (ExistingTime == 60 + i)
+                if (ExistingTime == 60 + i) 
                 {
                     Vector2 shoot = Projectile.rotation.ToRotationVector2().RotatedBy(Main.rand.NextFloat(-.1f, .1f)) * 16f;
                     for (int j = 0; i < 15; i++)

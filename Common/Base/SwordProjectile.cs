@@ -413,10 +413,11 @@ namespace MythosOfMoonlight.Common.Base
 
         /// <summary>
         /// Checks whether or not the given target is a target dummy. OnHit and such shouldnt apply to them, so make sure to check for this when doing so!
+        /// <br>Also</br>
         /// </summary>
         /// <param name="n">The npc to check.</param>
         /// <returns>True if the npc is, false otherwise.</returns>
-        public bool TargetIsNotADummy(NPC n) => n.type is not NPCID.TargetDummy;
+        public bool TargetIsNotADummy(NPC n) => n.type != NPCID.TargetDummy && n.CountsAsACritter; //based 
 
         /// <summary>
         /// Call to enable onhit effects again, if you already hit something

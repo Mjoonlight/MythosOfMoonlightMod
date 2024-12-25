@@ -60,7 +60,7 @@ namespace MythosOfMoonlight.Dusts
             Main.spriteBatch.Draw(tex, dust.position - Main.screenPosition, dust.frame, dust.color, dust.rotation, tex.Size() / 2f, dust.scale * (Vector2)dust.customData, SpriteEffects.None, 0f);
             Main.spriteBatch.Draw(tex, dust.position - Main.screenPosition, dust.frame, Color.Lerp(dust.color, Color.White, 0.3f), dust.rotation, tex.Size() / 2f, dust.scale * (Vector2)dust.customData * 0.65f, SpriteEffects.None, 0f);
 
-            return false;
+            return false; //what
         }
     }
 

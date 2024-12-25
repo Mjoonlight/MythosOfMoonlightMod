@@ -366,7 +366,7 @@ namespace MythosOfMoonlight
 
             return new Vector2(resX, resY);
         }
-        public struct Range
+        public struct Range //wtf ibanplay code
         {
             private readonly float min;
             private readonly float max;
