@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Terraria.Enums;
+using static Terraria.GameContent.Animations.IL_Actions.Sprites;
 
 namespace MythosOfMoonlight.Common.Base
 {
@@ -97,7 +99,13 @@ namespace MythosOfMoonlight.Common.Base
             }
         }
 
-        public virtual float TargetScale() => Projectile.scale = Projectile.timeLeft / MaximumTime * MaximumScale;
+        public virtual void TargetScale()
+        {
+            Projectile.scale = (float)Sin(Time / MaximumTime * Pi) * ScaleInOutRate * MaximumScale;
+
+            if (Projectile.scale > MaximumScale)
+                Projectile.scale = MaximumScale;
+        }
 
         public sealed override void SetDefaults()
         {
@@ -124,7 +132,7 @@ namespace MythosOfMoonlight.Common.Base
             Projectile.rotation = dir - PiOver2;
             Projectile.velocity = dir.ToRotationVector2();
 
-            Projectile.scale = Clamp(TargetScale(), 0f, MaximumScale);
+            TargetScale();
 
             CurrentLength = SmoothStep(CurrentLength, TargetLength(TileCollisionDetectionCount, Projectile.tileCollide), ElongationFactor);
 

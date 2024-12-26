@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria.Graphics.Shaders;
 
 namespace MythosOfMoonlight.Assets.Effects
 {
@@ -75,40 +76,49 @@ namespace MythosOfMoonlight.Assets.Effects
         public void PrepareStripWithProceduralPadding(Vector2[] positions, float[] rotations, StripColorFunction colorFunction, StripHalfWidthFunction widthFunction, Vector2 offsetForAllPositions = default(Vector2), bool includeBacksides = false, bool tryStoppingOddBug = true)
         {
             int num = positions.Length;
+
             _temporaryPositionsCache.Clear();
             _temporaryRotationsCache.Clear();
 
-            for (int i = 0; i < num && !(positions[i] == Vector2.Zero); i++)
+            for (int i = 0; i < num && (positions[i] != Vector2.Zero); i++)
             {
                 Vector2 vector = positions[i];
+
                 float num2 = WrapAngle(rotations[i]);
+
                 _temporaryPositionsCache.Add(vector);
                 _temporaryRotationsCache.Add(num2);
 
-                if (i + 1 >= num || !(positions[i + 1] != Vector2.Zero))
+                if (i + 1 >= num || (positions[i + 1] == Vector2.Zero))
                 {
                     continue;
                 }
 
                 Vector2 vector2 = positions[i + 1];
+
                 float num3 = WrapAngle(rotations[i + 1]);
-                int num4 = (int)(Math.Abs(WrapAngle(num3 - num2)) / ((float)Math.PI / 12f));
+                int num4 = (int)(Math.Abs(WrapAngle(num3 - num2)) / (Pi / 12f));
 
                 if (num4 != 0)
                 {
                     float num5 = vector.Distance(vector2);
+
                     Vector2 value = vector + num2.ToRotationVector2() * num5;
                     Vector2 value2 = vector2 + num3.ToRotationVector2() * (0f - num5);
+
                     int num6 = num4 + 2;
                     float num7 = 1f / (float)num6;
+
                     Vector2 target = vector;
 
                     for (float num8 = num7; num8 < 1f; num8 += num7)
                     {
                         Vector2 vector3 = Vector2.CatmullRom(value, vector, vector2, value2, num8);
-                        float item = MathHelper.WrapAngle(vector3.DirectionTo(target).ToRotation());
+                        float item = WrapAngle(vector3.DirectionTo(target).ToRotation());
+
                         _temporaryPositionsCache.Add(vector3);
                         _temporaryRotationsCache.Add(item);
+
                         target = vector3;
                     }
                 }
@@ -123,7 +133,7 @@ namespace MythosOfMoonlight.Assets.Effects
                 {
                     Vector2 pos = _temporaryPositionsCache[j] + offsetForAllPositions;
                     float rot = _temporaryRotationsCache[j];
-                    int indexOnVertexArray = j * 2;
+                    int indexOnVertexArray = (int)(j * 2f);
                     float progressOnStrip = (float)j / (float)(count - 1);
                     AddVertex(colorFunction, widthFunction, pos, rot, indexOnVertexArray, progressOnStrip);
                 }
@@ -136,7 +146,7 @@ namespace MythosOfMoonlight.Assets.Effects
         private void PrepareIndices(int vertexPadsAdded, bool includeBacksides)
         {
             int num = vertexPadsAdded - 1;
-            int num2 = 6 + includeBacksides.ToInt() * 6;
+            int num2 = (int)(6 + includeBacksides.ToInt() * 6f);
             int num3 = (_indicesAmountCurrentlyMaintained = num * num2);
 
             if (_indices.Length < num3)
@@ -148,6 +158,7 @@ namespace MythosOfMoonlight.Assets.Effects
             {
                 short num5 = (short)(num4 * num2);
                 int num6 = num4 * 2;
+
                 _indices[num5] = (short)num6;
                 _indices[num5 + 1] = (short)(num6 + 1);
                 _indices[num5 + 2] = (short)(num6 + 2);

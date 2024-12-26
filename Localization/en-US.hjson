@@ -587,6 +587,7 @@ Mods: {
 			EstrellaSlashProj.DisplayName: Estrella Slash Proj
 			MOCIrisProj2.DisplayName: M O C Iris Proj2
 			MOCIrisProj3.DisplayName: M O C Iris Proj3
+			TestLaser.DisplayName: Test Laser
 		}
 
 		NPCs: {

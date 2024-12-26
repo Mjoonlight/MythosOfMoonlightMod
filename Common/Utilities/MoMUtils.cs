@@ -292,6 +292,18 @@ namespace MythosOfMoonlight.Common.Utilities
 
         public static float SineInOut(float t) => (0f - (Cos(t * Pi) - 1f)) * 0.5f;
 
+        public static void PrepareForShaders(this SpriteBatch spriteBatch, BlendState blendState = null, Effect effect = null)
+        {
+            spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Immediate, blendState ?? BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Main.GameViewMatrix.TransformationMatrix);
+        }
+
+        public static void  ClearFromShaders(this SpriteBatch spriteBatch)
+        {
+            spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+        }
+
         public static bool ConsumeAmmo(Item heldItem, Player player, out int AmmoItemTypeFound, out int damage, int amount = 1, bool consume = true, int overrideAmmoItemType = -69420)
         {
             bool validAmmoFound = false;

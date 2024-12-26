@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using MythosOfMoonlight.Assets.Effects;
 using Terraria.Graphics.Shaders;
 using MythosOfMoonlight.NPCs.Minibosses.RupturedPilgrim.Projectiles;
+using MythosOfMoonlight.Common.Base;
 
 namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 {
@@ -122,7 +123,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                 Projectile.Kill();
 
             if (!Owner.CheckMana(Owner.HeldItem.mana, false))
-                die = die2 = true;
+                die = true;
 
             Projectile.damage = Owner.GetWeaponDamage(Owner.HeldItem);
             Projectile.CritChance = Owner.GetWeaponCrit(Owner.HeldItem);
@@ -189,7 +190,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                     }
                 }
 
-                if(Time == FullyChargedTime || Time == FullyChargedTime / 3f || Time == (2 * FullyChargedTime) / 3f)
+                if (Time == FullyChargedTime || Time == FullyChargedTime / 3f || Time == (2 * FullyChargedTime) / 3f)
                 {
                     for (int i = 0; i < 40; i++)
                     {
@@ -267,8 +268,8 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 
                         if (FireCheck < 9f || FireCheck > 18f)
                             RotOffset = Lerp(RotOffset, -PiOver4 * 0.4f * Projectile.direction * mult, 0.2f);
-                    
-                        if(FireCheck > 9f && FireCheck < 18f)
+
+                        if (FireCheck > 9f && FireCheck < 18f)
                             RotOffset = Lerp(RotOffset, 0f, 0.21f);
 
                         if (++FireCheck >= 45)
@@ -279,7 +280,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                     {
                         if (FireCheck == 0f || FireCheck == 18f || FireCheck == 36f)
                         {
-                            SpawnProjectle(Owner, ProjectileType<MOCIrisProj3>(), tipPosition + projVel * 1.75f, projVel * 3f, damage, 3f);
+                            SpawnProjectle(Owner, ProjectileType<TestLaser>(), tipPosition + projVel * 1.75f, projVel * 3f, damage, 3f);
                             FiringSound();
 
                             for (int i = 0; i < 8 + (1 + (FireCheck / 30f)); i++)
@@ -307,7 +308,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 
                 else
                 {
-                    if (Owner.channel && !die2) 
+                    if (Owner.channel && !die2)
                     {
                         RotOffset = Lerp(RotOffset, 0f, 0.15f);
 
@@ -323,7 +324,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                         }
                     }
 
-                    if(!Owner.channel)
+                    if (!Owner.channel)
                     {
                         die2 = true;
 
@@ -366,9 +367,6 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 
         public override void SetStaticDefaults()
         {
-            // DisplayName.SetDefault("Iris Ember");
-            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 20;
-            ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
             ProjectileID.Sets.CultistIsResistantTo[Projectile.type] = true;
 
             Projectile.AddElement(CrossModHelper.Celestial);
@@ -399,7 +397,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 
         float WidthFunction(float t)
         {
-            return Lerp(30f, 0f, 1f - t);
+            return Lerp(30f, 0f, 1f - t) * Projectile.scale;
         }
 
         public override bool PreDraw(ref Color lightColor)
@@ -413,13 +411,13 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 
             if (Projectile.timeLeft < 298)
             {
-                Trail.DrawTrail(Projectile, shader, 1f, -104f, ColorFunction, WidthFunction);
-                Trail.DrawTrail(Projectile, shader, 1f, 104f, ColorFunction, WidthFunction);
+                Trail.DrawTrail(Projectile, shader, 1f, -104f, ColorFunction, WidthFunction, Projectile.oldPos, Projectile.oldRot, -Main.screenPosition + (Projectile.Size / 2f));
+                Trail.DrawTrail(Projectile, shader, 1f, 104f, ColorFunction, WidthFunction, Projectile.oldPos, Projectile.oldRot, -Main.screenPosition + (Projectile.Size / 2f));
 
                 VFXManager.DrawCache.Add(() =>
                 {
-                    Trail.DrawTrail(Projectile, shader, 1f, -104f, ColorFunction, WidthFunction);
-                    Trail.DrawTrail(Projectile, shader, 1f, 104f, ColorFunction, WidthFunction);
+                    Trail.DrawTrail(Projectile, shader, 1f, -104f, ColorFunction, WidthFunction, Projectile.oldPos, Projectile.oldRot, -Main.screenPosition + (Projectile.Size / 2f));
+                    Trail.DrawTrail(Projectile, shader, 1f, 104f, ColorFunction, WidthFunction, Projectile.oldPos, Projectile.oldRot, -Main.screenPosition + (Projectile.Size / 2f));
                 });
 
                 Projectile.DrawTrail(trail, new Vector2(0.14f, 1.3f), Color.Violet, Color.Purple, 0f, 0.1f, 0.1f);
@@ -487,7 +485,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                 }
             }
 
-            for (int i = -1; i <= 1; i += 2) 
+            for (int i = -1; i <= 1; i += 2)
             {
                 Vector2 vel = Projectile.velocity * 0.03f * Main.rand.NextFloat(-1.15f, -0.51f);
 
@@ -509,6 +507,82 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                     CreateDust(DustType<PurpurineDust>(), vel, Projectile.Center + Projectile.velocity, Color.White, Main.rand.NextFloat(0.75f, 1.26f), 0);
                 }
             }
+        }
+    }
+
+    class TestLaser : BeamProjectile
+    {
+        public override string Texture => TryGetTextureFromOther<MOCIris>();
+
+        public override float MaximumScale => 1.2f;
+
+        public override float MaximumTime => 50f;
+
+        public override float MaximumLength => 1500f;
+
+        public override void SafeSetDefaults()
+        {
+            Projectile.width = 15;
+            Projectile.height = 15;
+            Projectile.alpha = 255;
+            Projectile.penetrate = -1;
+            Projectile.tileCollide = false;
+            Projectile.friendly = true;
+            Projectile.timeLeft = (int)MaximumTime;
+            ProjectileID.Sets.TrailingMode[Type] = 2;
+        }
+
+        public override void MiscAI()
+        {
+
+        }
+
+        public override void TargetScale() => Projectile.scale = Projectile.timeLeft / MaximumTime * MaximumScale;
+
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            base.OnHitNPC(target, hit, damageDone);
+        }
+
+        Color ColorFunction(float t)
+        {
+            return Color.Lerp(Color.Purple, Color.BlueViolet, t * 1.5f);
+        }
+
+        float WidthFunction(float t)
+        {
+            return Lerp(3f, 30f, t * 2.3f) * Projectile.scale;
+        }
+
+        public override bool PreDraw(ref Color lightColor)
+        {
+            Main.spriteBatch.PrepareForShaders(BlendState.Additive);
+
+            Vector2 end = Projectile.Center + NormalizeBetter(Projectile.velocity) * CurrentLength;
+
+            Vector2[] points = new Vector2[16];
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                Vector2 randOffset = points[i];
+
+                points[i] = Vector2.Lerp(Projectile.Center + randOffset, end, i / (float)(points.Length - 1f));
+            }
+
+            float[] rotations = new float[16];
+
+            for (int i = 0; i < rotations.Length; i++)
+            {
+                rotations[i] = Projectile.velocity.ToRotation();
+            }
+
+            MiscShaderData data = GameShaders.Misc["FlameLash"].UseColor(Color.Blue).UseImage1(Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/Ex1")).UseImage0(Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/Noise1"));
+
+            Trail.DrawTrail(Projectile, data, 7f, 1.2f, ColorFunction, WidthFunction, points, rotations, -Main.screenPosition);
+
+            Main.spriteBatch.ClearFromShaders();
+
+            return false;
         }
     }
 }

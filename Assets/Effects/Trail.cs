@@ -22,7 +22,7 @@ namespace MythosOfMoonlight.Assets.Effects
         /// <param name="widthFunction"></param>
         /// <param name="UseBacksides"></param>
         /// <param name="TryFixingMissalignment"></param>
-        public static void DrawTrail(Projectile proj, MiscShaderData data, float opacity, float saturation, VertexStrip.StripColorFunction colorFunction, VertexStrip.StripHalfWidthFunction widthFunction, bool UseBacksides = true, bool TryFixingMissalignment = false)
+        public static void DrawTrail(Projectile proj, MiscShaderData data, float opacity, float saturation, VertexStrip.StripColorFunction colorFunction, VertexStrip.StripHalfWidthFunction widthFunction, Vector2[] positions, float[] rotations, Vector2 offset, bool UseBacksides = true, bool TryFixingMissalignment = false)
         {
             MiscShaderData miscShaderData = data;
 
@@ -30,7 +30,10 @@ namespace MythosOfMoonlight.Assets.Effects
             miscShaderData.UseOpacity(opacity);
             miscShaderData.Apply();
 
-            _vertexStrip.PrepareStripWithProceduralPadding(proj.oldPos, proj.oldRot, colorFunction, widthFunction, -Main.screenPosition + (proj.Size * 0.5f), UseBacksides, TryFixingMissalignment);
+            positions ??= proj.oldPos;
+            rotations ??= proj.oldRot;
+
+            _vertexStrip.PrepareStripWithProceduralPadding(positions, rotations, colorFunction, widthFunction, offset, UseBacksides, TryFixingMissalignment);
             _vertexStrip.DrawTrail();
 
             Main.pixelShader.CurrentTechnique.Passes[0].Apply();
