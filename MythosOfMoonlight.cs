@@ -395,14 +395,17 @@ namespace MythosOfMoonlight
                 ? Vector2.Normalize(oldPos[index] - oldPos[index - 1])
                 : Vector2.Normalize(oldPos[index + 1] - oldPos[index - 1])).RotatedBy(MathHelper.Pi / 2);
         }
+
         public static VertexPositionColorTexture AsVertex(Vector2 position, Color color, Vector2 texCoord)
         {
             return new VertexPositionColorTexture(new Vector3(position, 50), color, texCoord);
         }
+
         public static VertexPositionColorTexture AsVertex(Vector3 position, Color color, Vector2 texCoord)
         {
             return new VertexPositionColorTexture(position, color, texCoord);
         }
+
         public static void DrawTexturedPrimitives(VertexPositionColorTexture[] vertices, PrimitiveType type, Texture2D texture, bool drawBacksides = true)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
@@ -410,6 +413,7 @@ namespace MythosOfMoonlight
             effect.Parameters["WorldViewProjection"].SetValue(GetMatrix());
             effect.Parameters["tex"].SetValue(texture);
             effect.CurrentTechnique.Passes["Texture"].Apply();
+
             if (drawBacksides)
             {
                 short[] indices = new short[vertices.Length * 2];
@@ -427,11 +431,13 @@ namespace MythosOfMoonlight
                 device.DrawUserIndexedPrimitives(type, vertices, 0, vertices.Length, indices, 0,
                     GetPrimitiveCount(vertices.Length, type) * 2);
             }
+
             else
             {
                 device.DrawUserPrimitives(type, vertices, 0, GetPrimitiveCount(vertices.Length, type));
             }
         }
+
         private static int GetPrimitiveCount(int vertexCount, PrimitiveType type)
         {
             switch (type)

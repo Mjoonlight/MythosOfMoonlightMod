@@ -573,10 +573,12 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 
             for (int i = 0; i < rotations.Length; i++)
             {
-                rotations[i] = Projectile.velocity.ToRotation();
+                rotations[i] = Projectile.velocity.ToRotation(); 
             }
 
-            MiscShaderData data = GameShaders.Misc["FlameLash"].UseColor(Color.Blue).UseImage1(Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/Ex1")).UseImage0(Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/Noise1"));
+            MiscShaderData data = GameShaders.Misc["BasicTrail"].UseColor(Color.Blue).UseImage1(Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/Ex1")).UseImage0(Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/Noise1"));
+           
+            data.Shader.Parameters["uWorldViewProjection"].SetValue(Helper.GetMatrix());
 
             Trail.DrawTrail(Projectile, data, 7f, 1.2f, ColorFunction, WidthFunction, points, rotations, -Main.screenPosition);
 
