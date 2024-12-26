@@ -12,23 +12,28 @@ namespace MythosOfMoonlight.Assets.Effects
         private static VertexStrip _vertexStrip = new VertexStrip();
 
         /// <summary>
-        /// Draws a trail behind the provided projctile.
+        /// Draws a trail behind the provided projectile.
         /// </summary>
-        /// <param name="proj">The proj to draw to.</param>
-        /// <param name="col">The color to draw with.</param>
-        /// <param name="width">The width of the trail.</param>
-        public static void DrawTrail(Projectile proj, float opacity, float saturation, VertexStrip.StripColorFunction colorFunction, VertexStrip.StripHalfWidthFunction widthFunction, bool UseBacksides = true, bool TryFixingMissalignment = false)
+        /// <param name="proj"></param>
+        /// <param name="data"></param>
+        /// <param name="opacity"></param>
+        /// <param name="saturation"></param>
+        /// <param name="colorFunction"></param>
+        /// <param name="widthFunction"></param>
+        /// <param name="UseBacksides"></param>
+        /// <param name="TryFixingMissalignment"></param>
+        public static void DrawTrail(Projectile proj, MiscShaderData data, float opacity, float saturation, VertexStrip.StripColorFunction colorFunction, VertexStrip.StripHalfWidthFunction widthFunction, bool UseBacksides = true, bool TryFixingMissalignment = false)
         {
-            MiscShaderData miscShaderData = GameShaders.Misc["RainbowRod"];
+            MiscShaderData miscShaderData = data;
 
             miscShaderData.UseSaturation(saturation);
-            miscShaderData.UseOpacity(5f * opacity);
+            miscShaderData.UseOpacity(opacity);
             miscShaderData.Apply();
 
             _vertexStrip.PrepareStripWithProceduralPadding(proj.oldPos, proj.oldRot, colorFunction, widthFunction, -Main.screenPosition + (proj.Size * 0.5f), UseBacksides, TryFixingMissalignment);
             _vertexStrip.DrawTrail();
 
-            //Main.pixelShader.CurrentTechnique.Passes[0].Apply();
+            Main.pixelShader.CurrentTechnique.Passes[0].Apply();
         }
     }
 }

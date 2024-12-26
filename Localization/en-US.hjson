@@ -25,7 +25,7 @@ Mods: {
 
 			RustyCut: {
 				DisplayName: Rusty Cut
-				Description: Better get your tinnitus shot!
+				Description: Better get your tetanus shot!
 			}
 
 			BlinkrootB: {
@@ -362,7 +362,7 @@ Mods: {
 				DisplayName: Seeing Stars
 				Tooltip:
 					'''
-					'K. Raibus'
+					'n.'
 					Adapted by M. Johnathan
 					'''
 			}

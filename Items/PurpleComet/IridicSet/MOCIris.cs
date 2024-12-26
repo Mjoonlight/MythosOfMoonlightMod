@@ -15,6 +15,8 @@ using MythosOfMoonlight.Common.Globals;
 using MythosOfMoonlight.Common.Utilities;
 using System.Collections.Generic;
 using MythosOfMoonlight.Assets.Effects;
+using Terraria.Graphics.Shaders;
+using MythosOfMoonlight.NPCs.Minibosses.RupturedPilgrim.Projectiles;
 
 namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 {
@@ -76,11 +78,11 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 
         private Texture2D Tex, GlowTex;
 
-        public bool die, fired, actuallyFired = false;
+        public bool die, die2, fired, actuallyFired = false;
 
         public float RotOffset = 0f;
 
-        public float MaxChargeTime = 360f; //holding it up to here causes it to auto fire
+        public float MaxChargeTime = 245f; //holding it up to here causes it to auto fire
 
         public float FullyChargedTime = 180f;
 
@@ -108,14 +110,19 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
         {
             void FiringSound()
             {
-
+                SoundEngine.PlaySound(SoundID.Item68 with { Volume = 0.83f, Pitch = 0.3f - (Time / FullyChargedTime) }, tipPosition);
+                //SoundEngine.PlaySound(SoundID.Item125 with { Volume = 0.53f, Pitch = 0.2f - (Time / FullyChargedTime) }, tipPosition);
+                SoundEngine.PlaySound(SoundID.Item40 with { Pitch = -0.2f, Volume = 0.7f }, tipPosition);
             }
 
             if (Projectile.owner != Main.myPlayer)
                 return;
 
-            if (Owner.dead || !Owner.active || Owner.noItems || Owner.CCed || !Owner.CheckMana(Owner.HeldItem.mana, false))
+            if (Owner.dead || !Owner.active || Owner.noItems || Owner.CCed)
                 Projectile.Kill();
+
+            if (!Owner.CheckMana(Owner.HeldItem.mana, false))
+                die = die2 = true;
 
             Projectile.damage = Owner.GetWeaponDamage(Owner.HeldItem);
             Projectile.CritChance = Owner.GetWeaponCrit(Owner.HeldItem);
@@ -182,7 +189,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                     }
                 }
 
-                if(Time == FullyChargedTime)
+                if(Time == FullyChargedTime || Time == FullyChargedTime / 3f || Time == (2 * FullyChargedTime) / 3f)
                 {
                     for (int i = 0; i < 40; i++)
                     {
@@ -192,10 +199,10 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 
                         Vector2 pos = tipPosition + vel * 15f;
 
-                        CreateDust(DustType<PurpurineDust>(), (vel * 2.5f).RotatedBy(Sin(vel.X)), pos, default);
+                        CreateDust(DustType<PurpurineDust>(), (vel * 0.5f * (1.5f + (Time / FullyChargedTime))).RotatedBy(Sin(vel.X)), pos, default);
                     }
 
-                    SoundEngine.PlaySound(SoundID.NPCHit5 with { Pitch = -0.23f, Volume = 0.6f }, tipPosition);
+                    SoundEngine.PlaySound(SoundID.NPCHit5 with { Pitch = -2.1f + (1f + (Time / FullyChargedTime)), Volume = 0.6f }, tipPosition);
                 }
             }
 
@@ -207,6 +214,8 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                 {
                     float percent = Time / FullyChargedTime;
 
+                    float damage = (Projectile.damage * 1.2f) * (1.2f + (Time / MaxChargeTime));
+
                     if (percent < 0.333f)
                         fired = true; //end here, dont do anything
 
@@ -216,7 +225,8 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                     {
                         if (!actuallyFired)
                         {
-                            SpawnProjectle(Owner, ProjectileType<MOCIrisProj3>(), tipPosition + projVel * 1.75f, projVel * 3f, Projectile.damage, 3f);
+                            SpawnProjectle(Owner, ProjectileType<MOCIrisProj3>(), tipPosition + projVel * 1.75f, projVel * 3f, damage, 3f);
+                            FiringSound();
 
                             for (int i = 0; i < 8; i++)
                             {
@@ -240,7 +250,8 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                     {
                         if (FireCheck == 0f || FireCheck == 18f)
                         {
-                            SpawnProjectle(Owner, ProjectileType<MOCIrisProj3>(), tipPosition + projVel * 1.75f, projVel * 3f, Projectile.damage, 3f);
+                            SpawnProjectle(Owner, ProjectileType<MOCIrisProj3>(), tipPosition + projVel * 1.75f, projVel * 3f, damage, 3f);
+                            FiringSound();
 
                             for (int i = 0; i < 8 + (1 + (FireCheck / 30f)); i++)
                             {
@@ -268,7 +279,8 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                     {
                         if (FireCheck == 0f || FireCheck == 18f || FireCheck == 36f)
                         {
-                            SpawnProjectle(Owner, ProjectileType<MOCIrisProj3>(), tipPosition + projVel * 1.75f, projVel * 3f, Projectile.damage, 3f);
+                            SpawnProjectle(Owner, ProjectileType<MOCIrisProj3>(), tipPosition + projVel * 1.75f, projVel * 3f, damage, 3f);
+                            FiringSound();
 
                             for (int i = 0; i < 8 + (1 + (FireCheck / 30f)); i++)
                             {
@@ -295,12 +307,33 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 
                 else
                 {
-                    Projectile.Opacity = Lerp(Projectile.Opacity, 0f, 0.3f);
+                    if (Owner.channel && !die2) 
+                    {
+                        RotOffset = Lerp(RotOffset, 0f, 0.15f);
 
-                    RotOffset = Lerp(RotOffset, 0f, 0.15f);
+                        if (RotOffset.CloseTo(0f, 0.1f))
+                        {
+                            actuallyFired = false;
+                            die = false;
+                            fired = false;
+                            FireCheck = 0f;
+                            die2 = false;
+                            mult = 1f;
+                            Time = 0f;
+                        }
+                    }
 
-                    if (++KillTimer >= 16)
-                        Projectile.Kill();
+                    if(!Owner.channel)
+                    {
+                        die2 = true;
+
+                        Projectile.Opacity = Lerp(Projectile.Opacity, 0f, 0.3f);
+
+                        RotOffset = Lerp(RotOffset, 0f, 0.15f);
+
+                        if (++KillTimer >= 16)
+                            Projectile.Kill();
+                    }
                 }
             }
 
@@ -342,89 +375,140 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
             Projectile.AddElement(CrossModHelper.Fire);
         }
 
-        Texture2D trail;
+        Texture2D trail, star;
 
         public override void SetDefaults()
         {
-            Projectile.width = 5;
-            Projectile.height = 5;
+            Projectile.width = 8;
+            Projectile.height = 8;
             Projectile.friendly = true;
             Projectile.penetrate = 1;
             Projectile.tileCollide = true;
             Projectile.ignoreWater = false;
             Projectile.timeLeft = 300;
             Projectile.netUpdate = true;
-            Projectile.netImportant = true;
 
-            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 10;
-            ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
+            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 9;
+            ProjectileID.Sets.TrailingMode[Projectile.type] = 3;
         }
 
         Color ColorFunction(float t)
         {
-            return Color.Lerp(Color.Lerp(Color.Purple, Color.White, 0.2f), Color.Lerp(Color.Purple, Color.Violet, 0.6f), t);
+            return Color.Lerp(Color.Lerp(Color.Purple, Color.White, 0.2f), Color.Lerp(Color.MediumPurple, Color.Violet, 0.6f), t);
         }
 
         float WidthFunction(float t)
         {
-            return Lerp(20f, 10f, 1f - t);
+            return Lerp(30f, 0f, 1f - t);
         }
 
         public override bool PreDraw(ref Color lightColor)
         {
             trail ??= Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/slash").Value;
+            star ??= Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/GlowyStar").Value;
 
-            if (Projectile.timeLeft < 298)
-            {
-                Trail.DrawTrail(Projectile, 1f, -104f, ColorFunction, WidthFunction);
-                Trail.DrawTrail(Projectile, 1f, 104f, ColorFunction, WidthFunction);
-
-                VFXManager.DrawCache.Add(() =>
-                {
-                    Trail.DrawTrail(Projectile, 1f, -104f, ColorFunction, WidthFunction);
-                    Trail.DrawTrail(Projectile, 1f, 104f, ColorFunction, WidthFunction);
-                });
-            }
+            var shader = GameShaders.Misc["RainbowRod"];
 
             Main.spriteBatch.Reload(BlendState.Additive);
 
-           // Projectile.DrawTrail(TextureAssets.Extra[98], new Vector2(1.2f, 0.3f), Color.Violet, Color.Purple, 0f, 0.25f, 0.1f);
-           //Projectile.DrawTrail(TextureAssets.Extra[98], new Vector2(1.2f, 0.3f), Color.Red, Color.BurlyWood, 0f, 0.25f, 0.1f);
+            if (Projectile.timeLeft < 298)
+            {
+                Trail.DrawTrail(Projectile, shader, 1f, -104f, ColorFunction, WidthFunction);
+                Trail.DrawTrail(Projectile, shader, 1f, 104f, ColorFunction, WidthFunction);
+
+                VFXManager.DrawCache.Add(() =>
+                {
+                    Trail.DrawTrail(Projectile, shader, 1f, -104f, ColorFunction, WidthFunction);
+                    Trail.DrawTrail(Projectile, shader, 1f, 104f, ColorFunction, WidthFunction);
+                });
+
+                Projectile.DrawTrail(trail, new Vector2(0.14f, 1.3f), Color.Violet, Color.Purple, 0f, 0.1f, 0.1f);
+                Projectile.DrawTrail(trail, new Vector2(0.125f, 1.25f), Color.DarkBlue, Color.White, 0f, 0.1f, 0.1f);
+            }
+
+            Projectile.SimpleDrawProjectile_Offset(star, Main.rand.NextVector2Circular(5f, 5f), Color.Violet * 0.25f, true, 1f, Main.GlobalTimeWrappedHourly * 4f);
+            Projectile.SimpleDrawProjectile(star, Color.Violet, true, 0.7f, 0f);
 
             return false;
         }
 
+        NPC homingTarget = null;
+        bool chase, died = false;
         public override void AI()
         {
             Projectile.rotation = Projectile.velocity.ToRotation();
 
-            if (Projectile.timeLeft < 290f)
-                Projectile.GetGlobalProjectile<MoMGlobalProj>().HomingActions(Projectile, .135f + (++Projectile.localAI[0] / 100f), 25f, 500f);
-            
-            else Projectile.velocity *= 0.998f;
-        }
-
-        public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
-        {
-            SoundEngine.PlaySound(SoundID.Item25, Projectile.Center);
-          //  for (int i = 1; i <= 7; i++)
-          //  {
-             //   Vector2 vel = -Utils.SafeNormalize(Projectile.oldVelocity, Vector2.Zero).RotatedBy(Main.rand.NextFloat(-1f, 1f)) * Main.rand.NextFloat(1f, 2f);
-              //  Dust dust = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, ModContent.DustType<PurpurineDust>(), vel.X, vel.Y, 0, default, Main.rand.NextFloat(.6f, 1.8f));
-              //  dust.noGravity = true;
-            //}
-        }
-
-        public override bool OnTileCollide(Vector2 oldVelocity)
-        {
-            SoundEngine.PlaySound(SoundID.Item25, Projectile.Center);
-            for (int i = 1; i <= 7; i++)
+            //wait 10 ticks to home so the proj can actually go where it should!!!!
+            if (Projectile.timeLeft < 290)
             {
-                Vector2 vel = -Utils.SafeNormalize(Projectile.oldVelocity, Vector2.Zero).RotatedBy(Main.rand.NextFloat(-1f, 1f)) * Main.rand.NextFloat(1f, 2f);
-                Dust dust = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, ModContent.DustType<PurpurineDust>(), vel.X, vel.Y, 0, default, Main.rand.NextFloat(.6f, 1.8f));
-                dust.noGravity = true;
+                if (homingTarget == null && !chase)
+                {
+                    foreach (NPC npc in Main.npc)
+                    {
+                        if (npc.active && npc.CanBeChasedBy() && !npc.CountsAsACritter && !npc.friendly && npc.Distance(Projectile.Center) < 600f)
+                        {
+                            homingTarget = npc;
+                            chase = true;
+                            break;
+
+                        }
+                    }
+
+                    if (homingTarget == null)
+                    {
+                        Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.Zero, 0.14f);
+
+                        if (Projectile.velocity.Length().CloseTo(0.15f, 0.03f))
+                        {
+                            died = true; //no regular onkill stuff
+
+                            for (int i = 0; i < 19; i++)
+                            {
+                                Vector2 vel = Main.rand.NextVector2Circular(6f, 6f);
+
+                                CreateDust(DustType<PurpurineDust>(), vel, Projectile.Center + vel, Color.White, Main.rand.NextFloat(0.75f, 1.26f), 0);
+                            }
+
+                            Projectile.Kill();
+                        }
+
+                        chase = false;
+                    }
+                }
+
+                if (homingTarget != null && chase)
+                {
+                    Vector2 pos = homingTarget.Center + (Projectile.velocity * 0.015f * Projectile.velocity.Length());
+
+                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(pos) * ((++Projectile.ai[0] / 20f) + 20f), 0.2f);
+
+                    if (homingTarget == null || !homingTarget.active || homingTarget.life <= 0)
+                        chase = false;
+                }
             }
-            return base.OnTileCollide(oldVelocity);
+
+            for (int i = -1; i <= 1; i += 2) 
+            {
+                Vector2 vel = Projectile.velocity * 0.03f * Main.rand.NextFloat(-1.15f, -0.51f);
+
+                CreateDust(DustType<PurpurineDust>(), vel, Projectile.Center + Main.rand.NextVector2Circular(0.5f, 0.5f) + new Vector2(0f, 2f * i).RotatedBy(Projectile.velocity.ToRotation()), Color.White, Main.rand.NextFloat(0.75f, 1.26f), 0);
+            }
+        }
+
+        public override void OnKill(int timeLeft)
+        {
+            Collision.HitTiles(Projectile.Center + Projectile.velocity, Projectile.velocity, 4, 4);
+            SoundEngine.PlaySound(SoundID.Item27, Projectile.Center);
+
+            if (!died)
+            {
+                for (int i = 0; i < 12; i++)
+                {
+                    Vector2 vel = new Vector2(0f, 7f * Main.rand.NextFloat(0.5f, 1.2f)).RotatedBy(Projectile.velocity.ToRotation() + Main.rand.NextFloat(-Pi / 4f, Pi / 4f) - PiOver2);
+
+                    CreateDust(DustType<PurpurineDust>(), vel, Projectile.Center + Projectile.velocity, Color.White, Main.rand.NextFloat(0.75f, 1.26f), 0);
+                }
+            }
         }
     }
 }

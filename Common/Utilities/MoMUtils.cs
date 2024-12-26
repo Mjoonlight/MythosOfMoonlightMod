@@ -223,9 +223,9 @@ namespace MythosOfMoonlight.Common.Utilities
         /// <param name="extraRot">extra rotation that can be used to position the trail correctly</param>
         /// <param name="inc">how much to increment over the projectile's trail length. smaller values = longer trails</param>
         /// <param name="scaleEndLerpOverride">optional value that can be set as the minimum scale of the trailat the end. It lerps to 0 by default.</param>
-        public static void DrawTrail(this Projectile Projectile, Asset<Texture2D> texture, Vector2 scale, Color color, Color endColor, float extraRot = 0f, float inc = 0.4f, float scaleEndLerpOverride = 0f)
+        public static void DrawTrail(this Projectile Projectile, Texture2D texture, Vector2 scale, Color color, Color endColor, float extraRot = 0f, float inc = 0.4f, float scaleEndLerpOverride = 0f)
         {
-            Texture2D afterimageTexture = texture.Value;
+            Texture2D afterimageTexture = texture;
 
             for (float i = 0; i < ProjectileID.Sets.TrailCacheLength[Projectile.type]; i += inc)
             {
@@ -240,7 +240,7 @@ namespace MythosOfMoonlight.Common.Utilities
                 Vector2 center = Vector2.Lerp(Projectile.oldPos[(int)i], Projectile.oldPos[(int)i - 1], 1 - i % 1);
                 center += Projectile.Size / 2f;
 
-                float scaleMult = Lerp(1f, scaleEndLerpOverride == 0 ? 0.2f : scaleEndLerpOverride, i / (float)ProjectileID.Sets.TrailCacheLength[Projectile.type]);
+                float scaleMult = Lerp(1f, scaleEndLerpOverride, i / (float)ProjectileID.Sets.TrailCacheLength[Projectile.type]);
 
                 color = Color.Lerp(color, endColor, 1f - (i / (float)ProjectileID.Sets.TrailCacheLength[Projectile.type]));
 
@@ -278,8 +278,10 @@ namespace MythosOfMoonlight.Common.Utilities
         public static Vector2 ClosestPointInHitbox(Rectangle hitboxOfTarget, Vector2 desiredLocation)
         {
             Vector2 offset = desiredLocation - hitboxOfTarget.Center.ToVector2();
+
             offset.X = Math.Min(Math.Abs(offset.X), hitboxOfTarget.Width / 2) * Math.Sign(offset.X);
             offset.Y = Math.Min(Math.Abs(offset.Y), hitboxOfTarget.Height / 2) * Math.Sign(offset.Y);
+
             return hitboxOfTarget.Center.ToVector2() + offset;
         }
 
@@ -287,6 +289,8 @@ namespace MythosOfMoonlight.Common.Utilities
         {
             return ClosestPointInHitbox(entity.Hitbox, desiredLocation);
         }
+
+        public static float SineInOut(float t) => (0f - (Cos(t * Pi) - 1f)) * 0.5f;
 
         public static bool ConsumeAmmo(Item heldItem, Player player, out int AmmoItemTypeFound, out int damage, int amount = 1, bool consume = true, int overrideAmmoItemType = -69420)
         {
