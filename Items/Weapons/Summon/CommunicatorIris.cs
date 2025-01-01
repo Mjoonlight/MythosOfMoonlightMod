@@ -8,6 +8,7 @@ using MythosOfMoonlight.Items.Pets;
 using System;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using Terraria.GameContent.ItemDropRules;
 
 namespace MythosOfMoonlight.Items.Weapons.Summon
 {
@@ -70,21 +71,26 @@ namespace MythosOfMoonlight.Items.Weapons.Summon
             Projectile.aiStyle = -1;
             Projectile.DamageType = DamageClass.Summon;
         }
+
         public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
         {
             Player player = Main.player[Projectile.owner];
             fallThrough = player.position.Y > Projectile.position.Y + Projectile.height*1.5f;
             return base.TileCollideStyle(ref width, ref height, ref fallThrough, ref hitboxCenterFrac);
         }
+
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
             Collision.StepUp(ref Projectile.position, ref Projectile.velocity, Projectile.width, Projectile.height, ref Projectile.stepSpeed, ref Projectile.gfxOffY);
             return false;
         }
+
         public override bool? CanDamage() => false;
         Rectangle frames;
+
         float rotation;
         int frameCounter;
+
         public override bool PreDraw(ref Color lightColor)
         {
             frames.Width = 42;

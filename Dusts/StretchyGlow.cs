@@ -18,7 +18,8 @@ namespace MythosOfMoonlight.Dusts
             dust.frame = new Rectangle(0, 0, 30, 30);
             dust.active = true;
             dust.noGravity = true;
-            //squish it if you havent 
+
+            //squish it if you havent, but only ever so slightly
             dust.customData ??= new Vector2(Main.rand.NextFloat(0.9f, 1.1f), Main.rand.NextFloat(0.9f, 1.1f));
         }
 

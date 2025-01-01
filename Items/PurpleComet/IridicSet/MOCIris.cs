@@ -18,6 +18,7 @@ using MythosOfMoonlight.Assets.Effects;
 using Terraria.Graphics.Shaders;
 using MythosOfMoonlight.NPCs.Minibosses.RupturedPilgrim.Projectiles;
 using MythosOfMoonlight.Common.Base;
+using System.Linq;
 
 namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 {
@@ -25,16 +26,13 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
     {
         public override void SetStaticDefaults()
         {
-            // DisplayName.SetDefault("MOC-Iris");
-            /* Tooltip.SetDefault("Mars Originated Cannon, still slightly radioactive.\n" +
-                " Fires homing Embers after charging up. "); */
             ItemID.Sets.GamepadWholeScreenUseRange[Item.type] = true;
             ItemID.Sets.LockOnIgnoresCollision[Item.type] = true;
             Item.ResearchUnlockCount = 1;
         }
         public override void SetDefaults()
         {
-            Item.damage = 27;
+            Item.damage = 17;
             Item.DamageType = DamageClass.Magic;
             Item.mana = 2;
             Item.noUseGraphic = true;
@@ -52,11 +50,13 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
             Item.rare = ItemRarityID.Green;
             Item.shoot = ModContent.ProjectileType<MOCIrisProj2>();
         }
+
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
         {
             Texture2D tex = Helper.GetTex(Texture + "_Glow");
             spriteBatch.Draw(tex, Item.Center - Main.screenPosition, null, Color.White, rotation, tex.Size() / 2, scale, SpriteEffects.None, 0);
         }
+
         public override bool CanShoot(Player player)
         {
             return player.ownedProjectileCounts[ModContent.ProjectileType<MOCIrisProj>()] < 1 && player.statMana > 5;
@@ -83,9 +83,9 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 
         public float RotOffset = 0f;
 
-        public float MaxChargeTime = 245f; //holding it up to here causes it to auto fire
+        public float MaxChargeTime = 245f; //holding it up to here causes it to auto fire, and it will begin to charge up again if still held
 
-        public float FullyChargedTime = 180f;
+        public float FullyChargedTime = 180f; //you can let go to fire here, but the holdout dies
 
         float FireCheck, dustTimer = 0;
 
@@ -112,7 +112,6 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
             void FiringSound()
             {
                 SoundEngine.PlaySound(SoundID.Item68 with { Volume = 0.83f, Pitch = 0.3f - (Time / FullyChargedTime) }, tipPosition);
-                //SoundEngine.PlaySound(SoundID.Item125 with { Volume = 0.53f, Pitch = 0.2f - (Time / FullyChargedTime) }, tipPosition);
                 SoundEngine.PlaySound(SoundID.Item40 with { Pitch = -0.2f, Volume = 0.7f }, tipPosition);
             }
 
@@ -166,19 +165,20 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                     {
                         float rot = timeValue * (30 - i * 2);
                         float theta = i + timeValue;
-                        float phi = MathF.Sin(i * timeValue * 0.06f) * 2;
-                        float size = (MathF.Cos(theta - timeValue * 0.43f) + 2f) / 3f;
+                        float phi = Sin(i * timeValue * 0.06f) * 2;
+                        float size = (Cos(theta - timeValue * 0.43f) + 2f) / 3f;
 
                         for (int x = 0; x <= 5; x++)
                         {
                             Vector2 v0 = new Vector2(0, 40f + i * 2).RotatedBy(x / 2f + rot) * (1f - (Time / FullyChargedTime));
                             Vector2 newVelocity = v0.RotatedBy(PiOver2);
 
-                            v0.X *= MathF.Cos(theta);
-                            newVelocity.X *= MathF.Cos(theta);
+                            v0.X *= Cos(theta);
+                            newVelocity.X *= Cos(theta);
                             v0 = v0.RotatedBy(phi);
                             newVelocity = newVelocity.RotatedBy(phi);
                             v0 *= size;
+
                             newVelocity *= size;
                             newVelocity *= 0.1f;
 
@@ -280,7 +280,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                     {
                         if (FireCheck == 0f || FireCheck == 18f || FireCheck == 36f)
                         {
-                            SpawnProjectle(Owner, ProjectileType<TestLaser>(), tipPosition + projVel * 1.75f, projVel * 3f, damage, 3f);
+                            SpawnProjectle(Owner, ProjectileType<MOCIrisProj3>(), tipPosition + projVel * 1.75f, projVel * 3f, damage, 3f);
                             FiringSound();
 
                             for (int i = 0; i < 8 + (1 + (FireCheck / 30f)); i++)
@@ -405,24 +405,28 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
             trail ??= Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/slash").Value;
             star ??= Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/GlowyStar").Value;
 
-            var shader = GameShaders.Misc["RainbowRod"];
-
-            Main.spriteBatch.Reload(BlendState.Additive);
+            var shader = GameShaders.Misc["RainbowRod"].UseProjectionMatrix(true);
 
             if (Projectile.timeLeft < 298)
             {
-                Trail.DrawTrail(Projectile, shader, 1f, -104f, ColorFunction, WidthFunction, Projectile.oldPos, Projectile.oldRot, -Main.screenPosition + (Projectile.Size / 2f));
-                Trail.DrawTrail(Projectile, shader, 1f, 104f, ColorFunction, WidthFunction, Projectile.oldPos, Projectile.oldRot, -Main.screenPosition + (Projectile.Size / 2f));
+                Main.spriteBatch.PrepareForShaders(BlendState.Additive);
 
-                VFXManager.DrawCache.Add(() =>
-                {
-                    Trail.DrawTrail(Projectile, shader, 1f, -104f, ColorFunction, WidthFunction, Projectile.oldPos, Projectile.oldRot, -Main.screenPosition + (Projectile.Size / 2f));
-                    Trail.DrawTrail(Projectile, shader, 1f, 104f, ColorFunction, WidthFunction, Projectile.oldPos, Projectile.oldRot, -Main.screenPosition + (Projectile.Size / 2f));
-                });
+                //Trail.DrawTrail(Projectile, shader, 1f, -104f, ColorFunction, WidthFunction, Projectile.oldPos, Projectile.oldRot, -Main.screenPosition + (Projectile.Size / 2f));
+              //  Trail.DrawTrail(Projectile, shader, 1f, 104f, ColorFunction, WidthFunction, Projectile.oldPos, Projectile.oldRot, -Main.screenPosition + (Projectile.Size / 2f));
 
-                Projectile.DrawTrail(trail, new Vector2(0.14f, 1.3f), Color.Violet, Color.Purple, 0f, 0.1f, 0.1f);
-                Projectile.DrawTrail(trail, new Vector2(0.125f, 1.25f), Color.DarkBlue, Color.White, 0f, 0.1f, 0.1f);
+              //  VFXManager.DrawCache.Add(() =>
+              //  {
+              //      Trail.DrawTrail(Projectile, shader, 1f, -104f, ColorFunction, WidthFunction, Projectile.oldPos, Projectile.oldRot, -Main.screenPosition + (Projectile.Size / 2f));
+               //     Trail.DrawTrail(Projectile, shader, 1f, 104f, ColorFunction, WidthFunction, Projectile.oldPos, Projectile.oldRot, -Main.screenPosition + (Projectile.Size / 2f));
+                //});
+
+                Main.spriteBatch.ClearFromShaders();
+
+                Projectile.DrawTrail(trail, new Vector2(0.125f, 0.76f), Color.Purple, Color.Violet, 0f, 0.1f, 0.1f);
+                Projectile.DrawTrail(trail, new Vector2(0.14f, 0.26f), Color.Violet, Color.White, 0f, 0.1f, 0.1f);
             }
+
+            Main.spriteBatch.Reload(BlendState.Additive);
 
             Projectile.SimpleDrawProjectile_Offset(star, Main.rand.NextVector2Circular(5f, 5f), Color.Violet * 0.25f, true, 1f, Main.GlobalTimeWrappedHourly * 4f);
             Projectile.SimpleDrawProjectile(star, Color.Violet, true, 0.7f, 0f);
@@ -456,7 +460,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                     {
                         Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.Zero, 0.14f);
 
-                        if (Projectile.velocity.Length().CloseTo(0.15f, 0.03f))
+                        if (Projectile.velocity.Length().CloseTo(0.8f, 0.045f))
                         {
                             died = true; //no regular onkill stuff
 
@@ -485,11 +489,11 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                 }
             }
 
-            for (int i = -1; i <= 1; i += 2)
+            if (Projectile.velocity.Length() >= 2f)
             {
                 Vector2 vel = Projectile.velocity * 0.03f * Main.rand.NextFloat(-1.15f, -0.51f);
 
-                CreateDust(DustType<PurpurineDust>(), vel, Projectile.Center + Main.rand.NextVector2Circular(0.5f, 0.5f) + new Vector2(0f, 2f * i).RotatedBy(Projectile.velocity.ToRotation()), Color.White, Main.rand.NextFloat(0.75f, 1.26f), 0);
+                CreateDust(DustType<PurpurineDust>(), vel, Projectile.Center + Main.rand.NextVector2Circular(0.5f, 0.5f), Color.White, Main.rand.NextFloat(0.75f, 1.26f), 0);
             }
         }
 
@@ -510,81 +514,4 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
         }
     }
 
-    class TestLaser : BeamProjectile
-    {
-        public override string Texture => TryGetTextureFromOther<MOCIris>();
-
-        public override float MaximumScale => 1.2f;
-
-        public override float MaximumTime => 50f;
-
-        public override float MaximumLength => 1500f;
-
-        public override void SafeSetDefaults()
-        {
-            Projectile.width = 15;
-            Projectile.height = 15;
-            Projectile.alpha = 255;
-            Projectile.penetrate = -1;
-            Projectile.tileCollide = false;
-            Projectile.friendly = true;
-            Projectile.timeLeft = (int)MaximumTime;
-            ProjectileID.Sets.TrailingMode[Type] = 2;
-        }
-
-        public override void MiscAI()
-        {
-
-        }
-
-        public override void TargetScale() => Projectile.scale = Projectile.timeLeft / MaximumTime * MaximumScale;
-
-        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
-        {
-            base.OnHitNPC(target, hit, damageDone);
-        }
-
-        Color ColorFunction(float t)
-        {
-            return Color.Lerp(Color.Purple, Color.BlueViolet, t * 1.5f);
-        }
-
-        float WidthFunction(float t)
-        {
-            return Lerp(3f, 30f, t * 2.3f) * Projectile.scale;
-        }
-
-        public override bool PreDraw(ref Color lightColor)
-        {
-            Main.spriteBatch.PrepareForShaders(BlendState.Additive);
-
-            Vector2 end = Projectile.Center + NormalizeBetter(Projectile.velocity) * CurrentLength;
-
-            Vector2[] points = new Vector2[16];
-
-            for (int i = 0; i < points.Length; i++)
-            {
-                Vector2 randOffset = points[i];
-
-                points[i] = Vector2.Lerp(Projectile.Center + randOffset, end, i / (float)(points.Length - 1f));
-            }
-
-            float[] rotations = new float[16];
-
-            for (int i = 0; i < rotations.Length; i++)
-            {
-                rotations[i] = Projectile.velocity.ToRotation(); 
-            }
-
-            MiscShaderData data = GameShaders.Misc["BasicTrail"].UseColor(Color.Blue).UseImage1(Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/Ex1")).UseImage0(Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/Noise1"));
-           
-            data.Shader.Parameters["uWorldViewProjection"].SetValue(Helper.GetMatrix());
-
-            Trail.DrawTrail(Projectile, data, 7f, 1.2f, ColorFunction, WidthFunction, points, rotations, -Main.screenPosition);
-
-            Main.spriteBatch.ClearFromShaders();
-
-            return false;
-        }
-    }
 }

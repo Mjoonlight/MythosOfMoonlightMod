@@ -197,6 +197,34 @@ namespace MythosOfMoonlight.Common.Utilities
             Main.EntitySpriteDraw(texture, drawPos, new Microsoft.Xna.Framework.Rectangle?(sourceRectangle), IsGlow ? Color : Projectile.GetAlpha(Color), Projectile.rotation + extraRot, origin, Projectile.scale * scaleMod, spriteEffects, 0);
         }
 
+        public static void SimpleDrawProjectile(this Projectile Projectile, Texture2D texture, Vector2 drawPos, Color Color, bool IsGlow, float scaleMod = 1f, float extraRot = 0f)
+        {
+            SpriteEffects spriteEffects = Projectile.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+
+            int frameHeight = texture.Height / Main.projFrames[Projectile.type];
+            int startY = frameHeight * Projectile.frame;
+
+            Rectangle sourceRectangle = new(0, startY, texture.Width, frameHeight);
+
+            Vector2 origin = sourceRectangle.Size() / 2f;
+
+            Main.EntitySpriteDraw(texture, drawPos, new Microsoft.Xna.Framework.Rectangle?(sourceRectangle), IsGlow ? Color : Projectile.GetAlpha(Color), Projectile.rotation + extraRot, origin, Projectile.scale * scaleMod, spriteEffects, 0);
+        }
+
+        public static void SimpleDrawProjectile(this Projectile Projectile, Texture2D texture, Vector2 drawPos, Color Color, bool IsGlow, Vector2 scaleMod, float extraRot = 0f)
+        {
+            SpriteEffects spriteEffects = Projectile.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+
+            int frameHeight = texture.Height / Main.projFrames[Projectile.type];
+            int startY = frameHeight * Projectile.frame;
+
+            Rectangle sourceRectangle = new(0, startY, texture.Width, frameHeight);
+
+            Vector2 origin = sourceRectangle.Size() / 2f;
+
+            Main.EntitySpriteDraw(texture, drawPos, new Microsoft.Xna.Framework.Rectangle?(sourceRectangle), IsGlow ? Color : Projectile.GetAlpha(Color), Projectile.rotation + extraRot, origin, Projectile.scale * scaleMod, spriteEffects, 0);
+        }
+
         public static void SimpleDrawProjectile_Offset(this Projectile Projectile, Texture2D texture, Vector2 drawOffset, Color Color, bool IsGlow, float scaleMod = 1f, float extraRot = 0f)
         {
             SpriteEffects spriteEffects = Projectile.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
@@ -295,7 +323,7 @@ namespace MythosOfMoonlight.Common.Utilities
         public static void PrepareForShaders(this SpriteBatch spriteBatch, BlendState blendState = null, Effect effect = null)
         {
             spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Immediate, blendState ?? BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Main.GameViewMatrix.TransformationMatrix);
+            spriteBatch.Begin(SpriteSortMode.Immediate, blendState ?? BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Helper.GetMatrix());
         }
 
         public static void  ClearFromShaders(this SpriteBatch spriteBatch)
@@ -339,7 +367,7 @@ namespace MythosOfMoonlight.Common.Utilities
                                     item.TurnToAir();
                                 }
 
-                                break;
+                               // break;
                             }
 
                             else
@@ -350,14 +378,14 @@ namespace MythosOfMoonlight.Common.Utilities
                                     AmmoItemTypeFound = item.shoot;
                                     damage = item.damage;
                                     validAmmoFound = true;
-                                    break;
+                                   // break;
                                 }
 
                                 //no item or pouch
                                 else
                                 {
                                     validAmmoFound = false;
-                                    break;
+                                  //  break;
                                 }
                             }
                         }
@@ -382,7 +410,7 @@ namespace MythosOfMoonlight.Common.Utilities
                                 AmmoItemTypeFound = item.shoot;
                                 damage = item.damage;
                                 validAmmoFound = true;
-                                break;
+                               // break;
                             }
 
                             else
@@ -392,13 +420,13 @@ namespace MythosOfMoonlight.Common.Utilities
                                     AmmoItemTypeFound = item.shoot;
                                     damage = item.damage;
                                     validAmmoFound = true;
-                                    break;
+                                  //  break;
                                 }
 
                                 else
                                 {
                                     validAmmoFound = false;
-                                    break;
+                                  //  break;
                                 }
                             }
                         }

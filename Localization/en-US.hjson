@@ -130,7 +130,11 @@ Mods: {
 
 			CDGIris: {
 				DisplayName: CDG-Iris
-				Tooltip: Cosmos Derived Gun? Cosmos Derived Fun.
+				Tooltip:
+					'''
+					Cosmos Derived Gun? Cosmos Derived Fun.
+					Fires hitscan rounds
+					'''
 			}
 
 			CommunicatorIris: {
@@ -448,6 +452,11 @@ Mods: {
 				DisplayName: Star Whip
 				Tooltip: ""
 			}
+
+			CDGIris2: {
+				DisplayName: C D G Iris2
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {
@@ -588,6 +597,8 @@ Mods: {
 			MOCIrisProj2.DisplayName: M O C Iris Proj2
 			MOCIrisProj3.DisplayName: M O C Iris Proj3
 			TestLaser.DisplayName: Test Laser
+			CDGIrisHeld.DisplayName: C D G Iris Held
+			CDGIrisRound.DisplayName: C D G Iris Round
 		}
 
 		NPCs: {

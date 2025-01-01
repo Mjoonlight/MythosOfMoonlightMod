@@ -28,6 +28,16 @@ namespace MythosOfMoonlight.Common.Base
         #endregion
 
         /// <summary>
+        /// Whether or not the laser can expand to its desired length. Useful for making the laser stop at hit npcs.
+        /// </summary>
+        public bool CanLaserGrow = true;
+
+        /// <summary>
+        /// If true, then the laser will stop expanding past the npc it hit.
+        /// </summary>
+        public virtual bool CollidesWithNPCs { get; } = false;
+
+        /// <summary>
         /// The maximum length the laser can reach. Values beyond 4000f can cause lag on lower end pcs, so be cautious.
         /// </summary>
         public abstract float MaximumLength { get; }
@@ -73,6 +83,11 @@ namespace MythosOfMoonlight.Common.Base
         /// The owner of the projectile.
         /// </summary>
         public Player Owner { get => Main.player[Projectile.owner]; }
+
+        /// <summary>
+        /// A ratio of the laser's current length over the maximum length. 1f = fully grown, 0f = just spawned
+        /// </summary>
+        public float LengthRatio => CurrentLength / (float)MaximumLength;
 
         public virtual void SafeSetDefaults() { }
 
@@ -134,8 +149,9 @@ namespace MythosOfMoonlight.Common.Base
 
             TargetScale();
 
-            CurrentLength = SmoothStep(CurrentLength, TargetLength(TileCollisionDetectionCount, Projectile.tileCollide), ElongationFactor);
-
+            if (CanLaserGrow)
+                CurrentLength = SmoothStep(CurrentLength, TargetLength(TileCollisionDetectionCount, Projectile.tileCollide), ElongationFactor);
+        
             MiscAI(); //called after everything so you may manipulate these values if you must, but if you are doing that anyways you might as well just override AI again...
         }
 

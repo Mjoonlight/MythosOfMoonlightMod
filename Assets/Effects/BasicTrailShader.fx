@@ -19,6 +19,7 @@ float4 uShaderSpecificData;
 
 float pi = 3.141f;
 float tau = 6.283f;
+float noiseScrollRate = 2.45f;
 
 struct VertexShaderInput
 {
@@ -50,8 +51,20 @@ VertexShaderOutput VertexShaderFunction(in VertexShaderInput input)
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
     float4 color = input.Color;
+    float3 coords = input.TextureCoordinates; //x, y and z
+    float2 coord = input.TextureCoordinates; //only x and y
     
-    return color;
+    coord.y = ((coord.y - 0.5) / coords.z) + 0.5;
+    
+    float brightness = pow(sin(coord.y * pi), 5.6);
+    float noise = tex2D(uImage1, coord * 3 - float2(uTime * noiseScrollRate, 0));
+    float brightnessStreak = tex2D(uImage2, coord * float2(2, 1) - float2(uTime * ((5 * pi) / 9.7), 0)) + noise * brightness;
+    
+    float3 noiseColor = lerp(uColor, uSecondaryColor, noise); //xyz
+    
+    float4 finalColor = float4(noiseColor, 1);
+    
+    return (finalColor * brightness + brightnessStreak * brightness) * color.a * pow(1 - coords.x, ((5 * pi) / 9.7));
 }
 
 
