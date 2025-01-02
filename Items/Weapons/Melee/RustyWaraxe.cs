@@ -88,6 +88,8 @@ namespace MythosOfMoonlight.Items.Weapons.Melee
 
     public class RustyWaraxeR : ModItem
     {
+        public override bool IsLoadingEnabled(Mod mod) => false; //no
+
         public override string Texture => TryGetTextureFromOther<RustyWaraxe>();
 
         public override void SetDefaults()

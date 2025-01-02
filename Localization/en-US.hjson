@@ -651,6 +651,25 @@ Mods: {
 			Galactite.MapEntry: Galactite
 			GalactiteManuallyPlaced.MapEntry: Galactite Manually Placed
 		}
+
+		Configs: {
+			MythosOfMoonlightConfig: {
+				DisplayName: Mythos Of Moonlight Config
+				Graphics: "[c/00e6e6: Graphics]"
+
+				ParticleLimit: {
+					Label: Particle Limit
+					Tooltip: The maximum amount of particles that may exist simultaneously. Be wary of using higher values (>3000) as it can cause lag in some cases.
+				}
+
+				CanBloomBeUsed: {
+					Label: Allow Bloom Usage
+					Tooltip: Whether or not to enhance some visuals with bloom.
+				}
+
+				Headers.Graphics: Graphics Header
+			}
+		}
 	}
 
 	Tiles: {

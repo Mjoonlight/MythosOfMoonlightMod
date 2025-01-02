@@ -41,6 +41,9 @@ namespace MythosOfMoonlight.Common.Systems
         {
             bool flag = false;
 
+            if (!MythosOfMoonlightConfig.Instance.CanBloomBeUsed)
+                return false;
+
             if (DrawCache.Count != 0)
                 flag = true;
 
