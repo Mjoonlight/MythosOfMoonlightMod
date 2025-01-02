@@ -402,31 +402,16 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 
         public override bool PreDraw(ref Color lightColor)
         {
-            trail ??= Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/slash").Value;
+            trail ??= Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/flare").Value;
             star ??= Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/GlowyStar").Value;
 
-            var shader = GameShaders.Misc["RainbowRod"].UseProjectionMatrix(true);
+            Main.spriteBatch.Reload(BlendState.Additive);
 
             if (Projectile.timeLeft < 298)
             {
-                Main.spriteBatch.PrepareForShaders(BlendState.Additive);
-
-                //Trail.DrawTrail(Projectile, shader, 1f, -104f, ColorFunction, WidthFunction, Projectile.oldPos, Projectile.oldRot, -Main.screenPosition + (Projectile.Size / 2f));
-              //  Trail.DrawTrail(Projectile, shader, 1f, 104f, ColorFunction, WidthFunction, Projectile.oldPos, Projectile.oldRot, -Main.screenPosition + (Projectile.Size / 2f));
-
-              //  VFXManager.DrawCache.Add(() =>
-              //  {
-              //      Trail.DrawTrail(Projectile, shader, 1f, -104f, ColorFunction, WidthFunction, Projectile.oldPos, Projectile.oldRot, -Main.screenPosition + (Projectile.Size / 2f));
-               //     Trail.DrawTrail(Projectile, shader, 1f, 104f, ColorFunction, WidthFunction, Projectile.oldPos, Projectile.oldRot, -Main.screenPosition + (Projectile.Size / 2f));
-                //});
-
-                Main.spriteBatch.ClearFromShaders();
-
-                Projectile.DrawTrail(trail, new Vector2(0.125f, 0.76f), Color.Purple, Color.Violet, 0f, 0.1f, 0.1f);
-                Projectile.DrawTrail(trail, new Vector2(0.14f, 0.26f), Color.Violet, Color.White, 0f, 0.1f, 0.1f);
+                Projectile.DrawTrail(trail, new Vector2(0.125f, 0.076f), Color.Purple, Color.Violet, 0f, 0.1f, 0.1f);
+                Projectile.DrawTrail(trail, new Vector2(0.14f, 0.026f), Color.Violet, Color.White, 0f, 0.1f, 0.1f);
             }
-
-            Main.spriteBatch.Reload(BlendState.Additive);
 
             Projectile.SimpleDrawProjectile_Offset(star, Main.rand.NextVector2Circular(5f, 5f), Color.Violet * 0.25f, true, 1f, Main.GlobalTimeWrappedHourly * 4f);
             Projectile.SimpleDrawProjectile(star, Color.Violet, true, 0.7f, 0f);
@@ -436,6 +421,8 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
 
         NPC homingTarget = null;
         bool chase, died = false;
+        float time = 0f;
+
         public override void AI()
         {
             Projectile.rotation = Projectile.velocity.ToRotation();
@@ -452,15 +439,14 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                             homingTarget = npc;
                             chase = true;
                             break;
-
                         }
                     }
 
                     if (homingTarget == null)
                     {
-                        Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.Zero, 0.14f);
+                        Projectile.velocity *= 1.002f;
 
-                        if (Projectile.velocity.Length().CloseTo(0.8f, 0.045f))
+                        if (++time >= 120f)
                         {
                             died = true; //no regular onkill stuff
 

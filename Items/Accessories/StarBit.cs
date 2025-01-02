@@ -15,15 +15,13 @@ using Terraria.GameContent;
 
 namespace MythosOfMoonlight.Items.Accessories
 {
-
-public class StarBit: ModItem
+    public class StarBit : ModItem
     {
+        public override void SetStaticDefaults()
+        {
+            CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
 
-   public override void SetStaticDefaults()
-      {
-         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
-
-      }
+        }
 
         public override void SetDefaults()
         {
@@ -32,8 +30,8 @@ public class StarBit: ModItem
             Item.accessory = true;
             Item.value = Item.buyPrice(0, 1, 0, 0);
             Item.rare = ItemRarityID.Blue;
-
         }
+
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
             player.GetModPlayer<MoMPlayer>().StarBitShot = true;
@@ -44,11 +42,11 @@ public class StarBit: ModItem
         {
             return Color.White;
         }
+
         public override void AddRecipes()
         {
-            
-            
-        }
 
+
+        }
     }
 }

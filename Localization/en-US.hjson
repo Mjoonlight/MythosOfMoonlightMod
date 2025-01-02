@@ -457,6 +457,11 @@ Mods: {
 				DisplayName: C D G Iris2
 				Tooltip: ""
 			}
+
+			RustyWaraxeR: {
+				DisplayName: Rusty Waraxe R
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {
@@ -599,6 +604,7 @@ Mods: {
 			TestLaser.DisplayName: Test Laser
 			CDGIrisHeld.DisplayName: C D G Iris Held
 			CDGIrisRound.DisplayName: C D G Iris Round
+			RustyWaraxeSwing.DisplayName: Rusty Waraxe Swing
 		}
 
 		NPCs: {

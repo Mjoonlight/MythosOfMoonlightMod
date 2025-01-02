@@ -270,7 +270,7 @@ namespace MythosOfMoonlight.Common.Utilities
 
                 float scaleMult = Lerp(1f, scaleEndLerpOverride, i / (float)ProjectileID.Sets.TrailCacheLength[Projectile.type]);
 
-                color = Color.Lerp(color, endColor, 1f - (i / (float)ProjectileID.Sets.TrailCacheLength[Projectile.type]));
+                color = Color.Lerp(color, endColor, ((float)i / (float)ProjectileID.Sets.TrailCacheLength[Projectile.type]));
 
                 Main.EntitySpriteDraw(afterimageTexture, center - Main.screenPosition + new Vector2(0, Projectile.gfxOffY), null, color, rot, afterimageTexture.Size() / 2f, scale * Projectile.scale * scaleMult, SpriteEffects.None, 0);
             }

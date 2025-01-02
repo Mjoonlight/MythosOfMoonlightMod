@@ -30,7 +30,7 @@ namespace MythosOfMoonlight.Items.PurpleComet
             Item.useTime = Item.useAnimation = 10;
             Item.noMelee = true;
             Item.autoReuse = false;
-            Item.UseSound = SoundID.Item43;
+            Item.UseSound = SoundID.Shimmer1;
         }
 
         public override bool CanUseItem(Player player)
@@ -44,7 +44,7 @@ namespace MythosOfMoonlight.Items.PurpleComet
         public override bool? UseItem(Player player)
         {
             Main.NewText("You feel like you're levitating...", 179, 0, 255);
-            SoundEngine.PlaySound(SoundID.Roar, new Vector2((int)player.position.X, (int)player.position.Y));
+            SoundEngine.PlaySound(SoundID.Shimmer2, new Vector2((int)player.position.X, (int)player.position.Y));
             PurpleCometEvent.PurpleComet = true;
 
             Star.starfallBoost = 0;

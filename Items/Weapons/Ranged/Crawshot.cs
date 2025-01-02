@@ -343,12 +343,12 @@ namespace MythosOfMoonlight.Items.Weapons.Ranged
             cannon2W ??= Request<Texture2D>(Texture + "_Cannon2_White").Value;
             cannon3W ??= Request<Texture2D>(Texture + "_Cannon3_White").Value;
 
-            VFXManager.DrawCache.Add(() =>
-            {
-                Projectile.SimpleDrawProjectile(cannon1W, CannonColor[0] * Projectile.Opacity, true, 1f + CannonScaleInterpolant[0]);
-                Projectile.SimpleDrawProjectile(cannon2W, CannonColor[1] * Projectile.Opacity, true, 1f + CannonScaleInterpolant[1]);
-                Projectile.SimpleDrawProjectile(cannon3W, CannonColor[2] * Projectile.Opacity, true, 1f + CannonScaleInterpolant[2]);
-            });
+          // VFXManager.DrawCache.Add(() =>
+           // {
+            //    Projectile.SimpleDrawProjectile(cannon1W, CannonColor[0] * Projectile.Opacity, true, 1f + CannonScaleInterpolant[0]);
+           //     Projectile.SimpleDrawProjectile(cannon2W, CannonColor[1] * Projectile.Opacity, true, 1f + CannonScaleInterpolant[1]);
+           //     Projectile.SimpleDrawProjectile(cannon3W, CannonColor[2] * Projectile.Opacity, true, 1f + CannonScaleInterpolant[2]);
+            //});
 
             Projectile.SimpleDrawProjectile(cannon1W, CannonColor[0] * Projectile.Opacity, true, 1.01f + CannonScaleInterpolant[0]);
             Projectile.SimpleDrawProjectile(cannon2W, CannonColor[1] * Projectile.Opacity, true, 1.01f + CannonScaleInterpolant[1]);
