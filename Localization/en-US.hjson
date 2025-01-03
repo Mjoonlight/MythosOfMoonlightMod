@@ -47,6 +47,11 @@ Mods: {
 				DisplayName: Starlash Buff
 				Description: Mods.MythosOfMoonlight.Buffs.StarlashBuff.Description
 			}
+
+			StarFlames: {
+				DisplayName: Star Flames
+				Description: Mods.MythosOfMoonlight.Buffs.StarFlames.Description
+			}
 		}
 
 		Items: {
@@ -125,11 +130,12 @@ Mods: {
 
 			StarThrower: {
 				DisplayName: Star Thrower
-				Tooltip: 
-				'''
-				Lights enemies ablaze with cosmic fire!
-				Has a 67% chance to not consume ammo
-				'''
+				Tooltip:
+					'''
+					Lights enemies ablaze with cosmic fire!
+					Has a 67% chance to not consume ammo.
+					Ignores 25 points of enemy defense.
+					'''
 			}
 
 			CDGIris: {

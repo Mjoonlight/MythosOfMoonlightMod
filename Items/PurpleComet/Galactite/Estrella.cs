@@ -24,10 +24,10 @@ using MythosOfMoonlight.Common.Graphics.MoMParticles.Types;
 
 namespace MythosOfMoonlight.Items.PurpleComet.Galactite
 {
-    public class Estrella : ModItem
+    public class EstrellaR : ModItem
     {
         public override bool IsLoadingEnabled(Mod mod) => false;
-
+        public override string Texture => TryGetTextureFromOther<Estrella>();
         public override void SetDefaults()
         {
             Item.knockBack = 10f;
@@ -567,10 +567,8 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
         }
     }
 
-    public class EstrellaR : ModItem
+    public class Estrella : ModItem
     {
-        public override string Texture => TryGetTextureFromOther<Estrella>();
-
         public override void SetDefaults()
         {
             Item.knockBack = 10f;

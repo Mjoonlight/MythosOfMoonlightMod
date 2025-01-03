@@ -4,6 +4,7 @@ using MythosOfMoonlight.Common.Graphics.MoMParticles;
 using MythosOfMoonlight.Common.Graphics.MoMParticles.Types;
 using MythosOfMoonlight.Dusts;
 using MythosOfMoonlight.Items.PurpleComet.IridicSet;
+using ReLogic.Utilities;
 using System;
 using Terraria.ModLoader;
 
@@ -76,6 +77,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
         public override bool? CanDamage() => false;
 
         public Vector2 tipPosition = Vector2.Zero;
+        SlotId theOund;
 
         public override void AI()
         {
@@ -122,6 +124,14 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
 
                     else die = true;
                 }
+
+                if (Time > 7)
+                {
+                    if (SoundEngine.TryGetActiveSound(theOund, out var ound) && ound.IsPlaying)
+                        ound.Position = Projectile.Center;
+
+                    else theOund = SoundEngine.PlaySound(SoundID.DD2_KoboldIgniteLoop with { Pitch = -0.123f }, Projectile.Center);
+                }
             }
 
             if (!Owner.channel || die)
@@ -131,7 +141,12 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
                 Projectile.Opacity = Lerp(Projectile.Opacity, 0f, 0.13f);
 
                 if (++KillTimer >= 30)
+                {
+                    if (SoundEngine.TryGetActiveSound(theOund, out var ound) && ound.IsPlaying)
+                        ound.Stop();
+
                     Projectile.Kill();
+                }
             }
         }
 
@@ -210,7 +225,15 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
             Timer++;
         }
 
-        public override void OnHitNPC(NPC t, NPC.HitInfo hit, int damageDone) { }
+        public override void OnHitNPC(NPC t, NPC.HitInfo hit, int damageDone) => t.AddBuff(BuffType<StarFlames>(), 240);
+
+        public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
+        {
+            if (!target.SuperArmor)
+            {
+                modifiers.ArmorPenetration += 25f; //vanilla flamethrower has 15
+            }
+        }
 
         public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
         {
@@ -224,5 +247,66 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
         }
 
         public override bool PreDraw(ref Color lightColor) => false;
+    }
+
+    class StarFlames : ModBuff
+    {
+        public override string Texture => "MythosOfMoonlight/Assets/Textures/Extra/blank";
+
+        public override void SetStaticDefaults()
+        {
+            Main.buffNoTimeDisplay[Type] = true;
+            Main.buffNoSave[Type] = true;
+        }
+
+        public override void Update(NPC npc, ref int buffIndex)
+        {
+            npc.GetGlobalNPC<StarflameNPC>().BuffActive = true;
+        }
+    }
+
+    class StarflameNPC : GlobalNPC
+    {
+        public override bool InstancePerEntity => true;
+
+        public bool BuffActive;
+
+        float time = 0f;
+
+        public override void ResetEffects(NPC npc) => BuffActive = false;
+
+        public override void UpdateLifeRegen(NPC npc, ref int damage)
+        {
+            if (BuffActive)
+            {
+                if (npc.lifeRegen > 0)
+                    npc.lifeRegen = 0;
+
+                npc.lifeRegen -= 40;
+                damage = 4;
+            }
+
+            base.UpdateLifeRegen(npc, ref damage);
+        }
+
+        public override bool PreAI(NPC npc)
+        {
+            if (BuffActive)
+            {
+                if (++time % 4 == 0)
+                {
+                    Vector2 pos = npc.Center + new Vector2(Main.rand.NextFloat(-npc.width / 2, (npc.width / 2) + 1), Main.rand.NextFloat(10f, 17.2f) - (npc.height / 2f));
+                    Vector2 vel = -Vector2.UnitY * Main.rand.NextFloat(0.3f, 1.2f);
+
+                    ParticleHandler.SpawnParticle(new GlowyBall(Main.rand.NextVector2FromRectangle(npc.getRect()), vel, Color.DarkViolet, Color.Violet, Main.rand.Next(19, 27), 1f, -0.3f, Main.rand.NextFloat(0.8f, 1.5f), 0f, Vector2.One, 0.99f, 0.002f) { BloomColor = Color.Purple, DrawWithBloom = true });
+
+                    CreateDust(DustType<PurpurineDust>(), (vel * Main.rand.NextFloat(2.4f, 4f)).RotatedByRandom(Pi / 2.5f), Main.rand.NextVector2FromRectangle(npc.getRect()), Color.White, Main.rand.NextFloat(1.2f, 2.1f));
+                }
+            }
+
+            else time = 0f;
+
+            return base.PreAI(npc);
+        }
     }
 }
