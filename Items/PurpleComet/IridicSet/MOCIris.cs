@@ -160,7 +160,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                 if (Time > 3f)
                 {
                     float timeValue = (float)Main.time * 0.02f + Projectile.whoAmI;
-
+                    dustTimer += 2;
                     for (int i = 0; i < 8; i++)
                     {
                         float rot = timeValue * (30 - i * 2);
@@ -182,7 +182,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.IridicSet
                             newVelocity *= size;
                             newVelocity *= 0.1f;
 
-                            if (++dustTimer % 20 == 0f)
+                            if (dustTimer % 20 == 0f)
                             {
                                 CreateDust(DustType<PurpurineDust>(), newVelocity, tipPosition + v0 - newVelocity, Color.White, Main.rand.NextFloat(0.8f, 1.2f) * (1.2f - (Time / FullyChargedTime)));
                             }

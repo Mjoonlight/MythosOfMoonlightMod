@@ -48,6 +48,9 @@ namespace MythosOfMoonlight.Dusts
 
         public override bool PreDraw(Dust dust)
         {
+            if (!dust.active)
+                return false;
+
             Texture2D tex = Request<Texture2D>(Texture).Value;
 
             Main.spriteBatch.Reload(BlendState.Additive);

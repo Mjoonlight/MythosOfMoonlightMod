@@ -207,7 +207,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
                 Vector2 pos = Projectile.Center + Main.rand.NextVector2Circular(rand * 1.1f, rand * 1.1f);
                 Vector2 vel = Projectile.velocity * 0.12f;
 
-                GlowyBall ballz = new GlowyBall(pos, vel, color, Color.Violet, 60, 1f, -1f, 1.1f * scale * Main.rand.NextFloat(0.8f, 1.1f), 4f * scale, new Vector2(Main.rand.NextFloat(1.15f, 1.45f), Main.rand.NextFloat(0.9f, 1.1f)), 0.98f, 0.0035f) 
+                GlowyBall ballz = new GlowyBall(pos, vel, color, Color.Violet, 60, 1f, -1f, 1.1f * scale * Main.rand.NextFloat(0.8f, 1.1f), 4f * scale, new Vector2(Main.rand.NextFloat(1.15f, 1.45f), Main.rand.NextFloat(0.9f, 1.1f)), 0.98f, 0.00535f) 
                 {
                     DrawWithBloom = true, 
                     BloomColor = color,

@@ -94,15 +94,8 @@ namespace MythosOfMoonlight.Items.Weapons
 
             Vector2 drawCenter = Projectile.Center - Main.screenPosition;
 
-            BlendState _blendState = new BlendState();
-            _blendState.AlphaSourceBlend = Blend.SourceAlpha;
-            _blendState.AlphaDestinationBlend = Blend.InverseSourceAlpha;
-
-            _blendState.ColorSourceBlend = Blend.SourceAlpha;
-            _blendState.ColorDestinationBlend = Blend.InverseSourceAlpha;
-
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, _blendState, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
 
             DrawVertexByTwoLine(Request<Texture2D>(Texture).Value, lightColor, diagonal.XY(), diagonal.ZW(), drawCenter + mainVec * drawScale.X, drawCenter + mainVec * drawScale.Y);
 
