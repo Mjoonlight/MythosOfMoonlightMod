@@ -111,7 +111,7 @@ namespace MythosOfMoonlight.Dusts
                 {
                     Texture2D tex = Request<Texture2D>("MythosOFMoonlight/Assets/Textures/Extra/GlowSuperSmall").Value;
 
-                    Main.spriteBatch.Draw(tex, dust.position - Main.screenPosition, dust.frame, dust.color, dust.rotation, tex.Size() / 2f, dust.scale * new Vector2(1f, 1f / dust.velocity.Length()), SpriteEffects.None, 0f);
+                    Main.spriteBatch.Draw(tex, dust.position - Main.screenPosition, dust.frame, dust.color, dust.rotation, tex.Size() / 2f, dust.scale * (Vector2)dust.customData, SpriteEffects.None, 0f);
                 }
             }
         }

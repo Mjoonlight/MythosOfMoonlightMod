@@ -125,7 +125,11 @@ Mods: {
 
 			StarThrower: {
 				DisplayName: Star Thrower
-				Tooltip: ""
+				Tooltip: 
+				'''
+				Lights enemies ablaze with cosmic fire!
+				Has a 67% chance to not consume ammo
+				'''
 			}
 
 			CDGIris: {
@@ -605,6 +609,8 @@ Mods: {
 			CDGIrisHeld.DisplayName: C D G Iris Held
 			CDGIrisRound.DisplayName: C D G Iris Round
 			RustyWaraxeSwing.DisplayName: Rusty Waraxe Swing
+			StarThrowerProj.DisplayName: Star Thrower Proj
+			StarryFire.DisplayName: Starry Fire
 		}
 
 		NPCs: {

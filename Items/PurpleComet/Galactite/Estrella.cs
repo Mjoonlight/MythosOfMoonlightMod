@@ -19,17 +19,21 @@ using MythosOfMoonlight.Common.Base;
 using MythosOfMoonlight.Common.Systems;
 using MythosOfMoonlight.Items.PurpleComet.IridicSet;
 using System.Collections.Generic;
+using MythosOfMoonlight.Common.Graphics.MoMParticles;
+using MythosOfMoonlight.Common.Graphics.MoMParticles.Types;
 
 namespace MythosOfMoonlight.Items.PurpleComet.Galactite
 {
     public class Estrella : ModItem
     {
+        public override bool IsLoadingEnabled(Mod mod) => false;
+
         public override void SetDefaults()
         {
             Item.knockBack = 10f;
             Item.width = Item.height = 66;
             Item.crit = 5;
-            Item.damage = 38;
+            Item.damage = 45;
             Item.useAnimation = 32;
             Item.useTime = 32;
             Item.noUseGraphic = true;
@@ -495,10 +499,12 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
     public class EstrellaPImpact : ModProjectile
     {
         public override string Texture => "MythosOfMoonlight/Assets/Textures/Extra/blank";
+
         public override void SetStaticDefaults()
         {
             Projectile.AddElement(CrossModHelper.Celestial);
         }
+
         public override void SetDefaults()
         {
             Projectile.width = 30;
@@ -510,19 +516,24 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
             Projectile.scale = 0;
             Projectile.tileCollide = false;
         }
+
         public override bool? CanDamage()
         {
             return false;
         }
+
         public override bool ShouldUpdatePosition()
         {
             return false;
         }
+
         int seed;
+
         public override void OnSpawn(IEntitySource source)
         {
             seed = Main.rand.Next(int.MaxValue);
         }
+
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D tex = Helper.GetTex("MythosOfMoonlight/Assets/Textures/Extra/cone4");
@@ -565,7 +576,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
             Item.knockBack = 10f;
             Item.width = Item.height = 66;
             Item.crit = 5;
-            Item.damage = 38;
+            Item.damage = 45;
             Item.useAnimation = 32;
             Item.useTime = 32;
             Item.noUseGraphic = true;
@@ -680,24 +691,24 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
         public override void DrawTrail(Color color)
         {
             //inner
-            DrawTrailSection_Faded(TrailColorTex(), TrailShapeTex(), 0.99f, 0.2f, 0.99f);
+            DrawTrailSection_Faded(TrailColorTex(), TrailShapeTex(), 0.99f, 0.2f, 0.95f);
 
             // outer
-            DrawTrailSection_Faded(TrailColorTex(), TrailShapeTex(), 1.2f, 0.68f, 1.03f);
+            DrawTrailSection_Faded(TrailColorTex(), TrailShapeTex(), 1.2f, 0.68f, 0.97f);
 
             //faded
-            DrawTrailSection(TrailColorTex2(), TrailShapeTex(), 0.5f, 0.6f, 1f);
+            DrawTrailSection(TrailColorTex2(), TrailShapeTex(), 0.5f, 0.6f, 0.97f);
 
             //guh
             MythosOfMoonlight.StarryDrawCache.Add(() =>
             {
-                DrawTrailSection(TrailColorTex(), TrailTexturePath + "TrailShape_White", 3.5f, 0.12f, 0.98f);
+                DrawTrailSection(TrailColorTex(), TrailTexturePath + "TrailShape_White", 3f, 0.12f, 0.956f);
             });
 
             //blurry + glowy sigmaness
             VFXManager.DrawCache.Add(() =>
             {
-                DrawTrailSection(TrailColorTex(), TrailShapeTex(), 5f, 0.94f, 0.98f);
+                DrawTrailSection(TrailColorTex(), TrailShapeTex(), 5f, 0.9f, 0.95f);
             });
         }
 
@@ -736,68 +747,6 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
 
             useTrail = true;
             float t = 1f;
-
-            /*
-
-            if (attackType == 0)
-            {
-                float max = 30f;
-                float max2 = 50f;
-                float end = 75f;
-
-                if (timer < max)
-                {
-                    PrepareSwing(78f, PiOver2 - Player.direction * -0.85f, t, true, true, -12f);
-                }
-
-                if (timer > max && timer < max2)
-                {
-                    PrepareSwing(79f, PiOver2 - Player.direction * -0.67f, t, true, true, -12f);
-                }
-
-                EnactSwing(82f, max2, end, MiscArray[1] + 0.09f, -0.21f, 1400f, t, [SwingEffects, null], -1, -12f);
-
-                if (timer > end)
-                    isAttacking = false;
-
-                if (timer > end)
-                {
-                    ResetProjectileDamage();
-                    NextAttackType();
-                }
-            }
-
-            if (attackType == 1)
-            {
-                float max = 30f;
-                float max2 = 50f;
-                float end = 81f;
-
-                float t2 = (timer < max2 + 10 || timer > end - 18) ? 1f : 1.15f;
-
-                if (timer < max)
-                {
-                    PrepareSwing(78f, PiOver2 + Player.direction * 0.85f, t, true, true, -12f);
-                }
-
-                if (timer > max && timer < max2)
-                {
-                    PrepareSwing(79f, PiOver2 + Player.direction * 0.67f, t, true, true, -12f);
-                }
-
-                EnactSwing(80f, max2, end, MiscArray[1] + 0.09f, 0.223f * Lerp(t2, 1f, 0.2f), 1400f, t, [SwingEffects, null], -1, -12f);
-
-                if (timer > end)
-                    isAttacking = false;
-
-                if (timer > end)
-                {
-                    ResetProjectileDamage();
-                    NextAttackType();
-                }
-            }
-
-            */
 
             //combo:
 
@@ -929,6 +878,15 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
             {
                 Vector2 pos = Projectile.Center + (mainVec / 1.1f) * Main.rand.NextFloat(0.8f, 1.01f);
                 Vector2 vel = (mainVec / 100f) + Main.rand.NextVector2Circular(1f, 1f) + Player.velocity;
+
+                //showcasing
+                GlowyBall gb = new GlowyBall(pos, vel, Color.Violet, Color.Purple, 30, 1f, 0f, 1f, 0f, Vector2.One, 0.9f, 0.0002f)
+                {
+                    DrawWithBloom = true,
+                    BloomColor = Color.Magenta,
+                };
+
+                //ParticleHandler.SpawnParticle(gb);
 
                 //CreateDust(DustType<Starry2>(), vel, pos, Color.White, Main.rand.NextFloat(0.08f, 0.117f));
             }

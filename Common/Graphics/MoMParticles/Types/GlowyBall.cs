@@ -57,9 +57,15 @@ namespace MythosOfMoonlight.Common.Graphics.MoMParticles.Types
 
         public override void Draw(SpriteBatch spriteBatch)
         {
+            
             spriteBatch.Draw(Texture, Position - Main.screenPosition, null, EdgeColor * Opacity * 0.5f, Rotation, Texture.Size() / 2f, Scale * new Vector2(ScaleSquishFactor.X, ScaleSquishFactor.Y) * 0.7f, SpriteEffects.None, 0f);
+           
             spriteBatch.Draw(Texture, Position - Main.screenPosition, null, Color.Lerp(ParticleDrawColor, EdgeColor, 0.5f) * Opacity * 0.85f, Rotation, Texture.Size() / 2f, Scale * new Vector2(ScaleSquishFactor.X, ScaleSquishFactor.Y) * 0.56f, SpriteEffects.None, 0f);
+           
             spriteBatch.Draw(Texture, Position - Main.screenPosition, null, ParticleDrawColor * Opacity, Rotation, Texture.Size() / 2f, Scale * new Vector2(ScaleSquishFactor.X, ScaleSquishFactor.Y) * 0.3f, SpriteEffects.None, 0f);
+
+            spriteBatch.Draw(Texture, Position - Main.screenPosition, null, Color.Lerp(ParticleDrawColor, Color.White, 0.8f) * Opacity, Rotation, Texture.Size() / 2f, Scale * new Vector2(ScaleSquishFactor.X, ScaleSquishFactor.Y) * 0.14f, SpriteEffects.None, 0f);
+
         }
 
         public override void DrawBloom(SpriteBatch spriteBatch)
@@ -74,6 +80,9 @@ namespace MythosOfMoonlight.Common.Graphics.MoMParticles.Types
 
                 //make the inner bit bold
                 spriteBatch.Draw(Texture, Position - Main.screenPosition, null, ParticleDrawColor * Opacity * 0.95f, Rotation, Texture.Size() / 2f, Scale * new Vector2(ScaleSquishFactor.X, ScaleSquishFactor.Y) * 0.31f, SpriteEffects.None, 0f);
+
+                //MORE
+                spriteBatch.Draw(Texture, Position - Main.screenPosition, null, Color.Lerp(ParticleDrawColor, Color.White, 0.95f) * Opacity, Rotation, Texture.Size() / 2f, Scale * new Vector2(ScaleSquishFactor.X, ScaleSquishFactor.Y) * 0.05f, SpriteEffects.None, 0f);
             });
         }
     }
