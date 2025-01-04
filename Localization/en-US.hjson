@@ -472,6 +472,11 @@ Mods: {
 				DisplayName: Rusty Waraxe R
 				Tooltip: ""
 			}
+
+			PlantBow: {
+				DisplayName: Plant Bow
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {
@@ -619,6 +624,8 @@ Mods: {
 			StarryFire.DisplayName: Starry Fire
 			SporeBloomSpore.DisplayName: Spore Bloom Spore
 			SporebloomSpore.DisplayName: Sporebloom Spore
+			PlantBowP.DisplayName: Plant Bow P
+			SporeBowP2.DisplayName: Spore Bow P2
 		}
 
 		NPCs: {

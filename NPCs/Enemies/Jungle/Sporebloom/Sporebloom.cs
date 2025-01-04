@@ -35,12 +35,16 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
         {
             NPC.width = 52;
             NPC.height = 56;
+
             NPC.lifeMax = 240;
             NPC.defense = 20;
             NPC.damage = 5; //low contact dmg because the spores do the work
-            NPC.knockBackResist = 0.8f;
+
+            NPC.knockBackResist = 0.7f;
+
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
+
             NPC.aiStyle = -1;
 
             NPC.noGravity = true;
@@ -48,7 +52,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
 
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
-           
+            npcLoot.Add(ItemDropRule.NormalvsExpert(ItemType<PlantBow>(), 50, 25));
         }
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
@@ -62,7 +66,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
-            return SpawnCondition.UndergroundJungle.Chance * 0.15f;
+            return SpawnCondition.UndergroundJungle.Chance * 0.13f;
         }
 
         //order of writing and reading is important!!!
@@ -336,7 +340,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                         Logic[6] = 0f;
                         Logic[9] = Lerp(Logic[9], 1f, 0.041f);
 
-                        if (Logic[2] == 65f)
+                        if (Logic[2] == 65f && Main.getGoodWorld)
                         {
                             SoundEngine.PlaySound(new(Texture + "_hawkTuah"), NPC.Center);
                         }
@@ -513,6 +517,48 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
             }
         }
 
+        public override void HitEffect(NPC.HitInfo hit)
+        {
+            if (Main.dedServ)
+                return;
+
+            if (NPC.life <= 0)
+            {
+                for (int i = 0; i < 30; i++)
+                {
+                    Vector2 pos = NPC.Center + Main.rand.NextVector2Circular(100f, 100f);
+                    Vector2 vel = (-pos.DirectionTo(NPC.Center) * Main.rand.NextFloat(1.5f, 10f)) + new Vector2(0f, Main.rand.NextFloat(-7f, 4f));
+
+                    Color particleColor = Color.Lerp(Color.LimeGreen, Color.HotPink, Main.rand.NextFloat(1f));
+
+                    ParticleHandler.SpawnParticle(
+                    new GlowyBall(pos, vel, particleColor, Color.Lerp(particleColor, Color.White, 0.2f), 130, 0.8f, -0.1f, Main.rand.NextFloat(0.52f, 1.05f), -0.1f, Vector2.One, 0.9f, 0.0025f)
+                    {
+                        BloomColor = particleColor,
+                        DrawWithBloom = true,
+                    });
+                }
+            }
+
+            else
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    Vector2 pos = NPC.Center + Main.rand.NextVector2Circular(8f, 8f);
+                    Vector2 vel = -pos.DirectionTo(NPC.Center) * Main.rand.NextFloat(1.5f, 3f);
+
+                    Color particleColor = Color.Lerp(Color.LimeGreen, Color.HotPink, Main.rand.NextFloat(1f));
+
+                    ParticleHandler.SpawnParticle(
+                    new GlowyBall(pos, vel, particleColor, Color.Lerp(particleColor, Color.White, 0.2f), 130, 0.8f, -0.1f, Main.rand.NextFloat(0.52f, 1.05f), -0.1f, Vector2.One, 0.9f, 0.0025f)
+                    {
+                        BloomColor = particleColor,
+                        DrawWithBloom = true,
+                    });
+                }
+            }
+        }
+
         #region utils
 
         void ResetAllValues(int[] indexesToIgnore)
@@ -627,7 +673,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
 
             else
             {
-                Main.NewText(Projectile.alpha);
+                //Main.NewText(Projectile.alpha);
 
                 if (Projectile.timeLeft < 80)
                     Projectile.alpha += 2;
@@ -637,7 +683,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                 if (Projectile.alpha >= 255)
                     Projectile.Kill();
 
-                Projectile.scale += 0.0034f;
+                Projectile.scale += 0.0054f;
                 Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.Zero, 0.001f);
                 Projectile.rotation += 0.032f * Projectile.velocity.X;
 
@@ -655,6 +701,19 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                         DrawWithBloom = true,
                     });
                 }
+
+                if (Projectile.ai[2] == 1f)
+                {
+                    Projectile.velocity.Y += 0.023f;
+
+                    foreach (NPC n in Main.ActiveNPCs)
+                    {
+                        if (!n.friendly && !n.CountsAsACritter && n.Hitbox.Intersects(Projectile.Hitbox))
+                        {
+                            n.AddBuff(BuffID.Poisoned, 2);
+                        }
+                    }
+                }
             }
         }
 
@@ -662,6 +721,8 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
         {
             
         }
+
+
 
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
