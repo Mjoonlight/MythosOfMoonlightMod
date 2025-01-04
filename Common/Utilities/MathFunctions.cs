@@ -88,6 +88,7 @@ namespace MythosOfMoonlight.Common.Utilities
                 return $"backwards: {backwards} | a: {a} | Zero(1): {z1} Zero(2): {z2} | Increment: {increment[0]} | TotalTicks = {increment[1]}";
             }
         }
+
         /// <summary>
         /// Analytic Geometry Functions
         /// </summary>

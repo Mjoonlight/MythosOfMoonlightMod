@@ -20,11 +20,10 @@ using System.IO;
 using MythosOfMoonlight.Items.PurpleComet.Galactite;
 using MythosOfMoonlight.Items.Accessories;
 using MythosOfMoonlight.Projectiles.VFXProjectiles;
+using System.Runtime.CompilerServices;
 
 namespace MythosOfMoonlight
 {
-
-
     public static class TRay
     {
         public static Vector2 Cast(Vector2 start, Vector2 direction, float length, bool platformCheck = false)
@@ -367,7 +366,7 @@ namespace MythosOfMoonlight
 
             return new Vector2(resX, resY);
         }
-        public struct Range
+        public struct Range //wtf ibanplay code
         {
             private readonly float min;
             private readonly float max;
@@ -396,14 +395,17 @@ namespace MythosOfMoonlight
                 ? Vector2.Normalize(oldPos[index] - oldPos[index - 1])
                 : Vector2.Normalize(oldPos[index + 1] - oldPos[index - 1])).RotatedBy(MathHelper.Pi / 2);
         }
+
         public static VertexPositionColorTexture AsVertex(Vector2 position, Color color, Vector2 texCoord)
         {
             return new VertexPositionColorTexture(new Vector3(position, 50), color, texCoord);
         }
+
         public static VertexPositionColorTexture AsVertex(Vector3 position, Color color, Vector2 texCoord)
         {
             return new VertexPositionColorTexture(position, color, texCoord);
         }
+
         public static void DrawTexturedPrimitives(VertexPositionColorTexture[] vertices, PrimitiveType type, Texture2D texture, bool drawBacksides = true)
         {
             GraphicsDevice device = Main.graphics.GraphicsDevice;
@@ -411,6 +413,7 @@ namespace MythosOfMoonlight
             effect.Parameters["WorldViewProjection"].SetValue(GetMatrix());
             effect.Parameters["tex"].SetValue(texture);
             effect.CurrentTechnique.Passes["Texture"].Apply();
+
             if (drawBacksides)
             {
                 short[] indices = new short[vertices.Length * 2];
@@ -428,11 +431,13 @@ namespace MythosOfMoonlight
                 device.DrawUserIndexedPrimitives(type, vertices, 0, vertices.Length, indices, 0,
                     GetPrimitiveCount(vertices.Length, type) * 2);
             }
+
             else
             {
                 device.DrawUserPrimitives(type, vertices, 0, GetPrimitiveCount(vertices.Length, type));
             }
         }
+
         private static int GetPrimitiveCount(int vertexCount, PrimitiveType type)
         {
             switch (type)
@@ -524,53 +529,79 @@ namespace MythosOfMoonlight
         public static bool InRange(double value, double min, double max) => value < max && value > min;
         public static string ExtraDir = "MythosOfMoonlight/Assets/Textures/Extra/";
     }
+
     public class MythosOfMoonlight : Mod
     {
         public static RenderTarget2D OrigRender;
         public static RenderTarget2D DustTrail1;
         public static RenderTarget2D[] render = new RenderTarget2D[5];
         public static Effect PurpleCometEffect, BloomEffect, BlurEffect, Tentacle, TrailShader, RTAlpha, RTOutline, PullingForce, metaballGradient, SpriteRotation, metaballGradientNoiseTex, textureDisplacementWGradients, displacementMap;//, ScreenDistort;
+       
+        //yiik's stuff because that one long ahh line is crazy
+        public static Effect Bloom2, MeleeTrail, FadedMeleeTrail = null;
         public static MythosOfMoonlight Instance { get; set; }
+
+        public static List<Action> StarryDrawCache = [];
+
         public MythosOfMoonlight()
         {
             Instance = this;
         }
+
         public override void Unload()
         {
             On_FilterManager.EndCapture -= FilterManager_EndCapture;
             On_Player.SetTalkNPC -= Player_SetTalkNPC;
             Main.OnResolutionChanged -= Main_OnResolutionChanged;
+
+            StarryDrawCache?.Clear();
+            StarryDrawCache = [];
         }
+
         public override void Load()
         {
             if (!Main.dedServ)
             {
-                PurpleCometEffect = Instance.Assets.Request<Effect>("Assets/Effects/PurpleComet", AssetRequestMode.ImmediateLoad).Value;
-                BloomEffect = Instance.Assets.Request<Effect>("Assets/Effects/bloom", AssetRequestMode.ImmediateLoad).Value;
-                BlurEffect = Instance.Assets.Request<Effect>("Assets/Effects/blur", AssetRequestMode.ImmediateLoad).Value;
-                Tentacle = Instance.Assets.Request<Effect>("Assets/Effects/Tentacle", AssetRequestMode.ImmediateLoad).Value;
-                TrailShader = Instance.Assets.Request<Effect>("Assets/Effects/TrailShader", AssetRequestMode.ImmediateLoad).Value;
-                RTAlpha = Instance.Assets.Request<Effect>("Assets/Effects/RTAlpha", AssetRequestMode.ImmediateLoad).Value;
-                RTOutline = Instance.Assets.Request<Effect>("Assets/Effects/RTOutline", AssetRequestMode.ImmediateLoad).Value;
-                PullingForce = Instance.Assets.Request<Effect>("Assets/Effects/PullingForce", AssetRequestMode.ImmediateLoad).Value;
-                metaballGradient = Instance.Assets.Request<Effect>("Assets/Effects/metaballGradient", AssetRequestMode.ImmediateLoad).Value;
-                SpriteRotation = Instance.Assets.Request<Effect>("Assets/Effects/spriteRotation", AssetRequestMode.ImmediateLoad).Value;
-                metaballGradientNoiseTex = Instance.Assets.Request<Effect>("Assets/Effects/metaballGradientNoiseTex", AssetRequestMode.ImmediateLoad).Value;
-                textureDisplacementWGradients = Instance.Assets.Request<Effect>("Assets/Effects/textureDisplacementWGradients", AssetRequestMode.ImmediateLoad).Value;
-                displacementMap = Instance.Assets.Request<Effect>("Assets/Effects/displacementMap", AssetRequestMode.ImmediateLoad).Value;
-                //ScreenDistort = Instance.Assets.Request<Effect>("Assets/Effects/DistortMove", AssetRequestMode.ImmediateLoad).Value;
-                Filters.Scene["PurpleComet"] = new Filter(new ScreenShaderData(new Ref<Effect>(PurpleCometEffect), "ModdersToolkitShaderPass"), EffectPriority.VeryHigh);
-                SkyManager.Instance["PurpleComet"] = new Events.PurpleCometSky();
-
-                Filters.Scene["Asteroid"] = new Filter(new ScreenShaderData("FilterMiniTower").UseColor(0f, 0f, 0f).UseOpacity(0f), EffectPriority.VeryHigh);
-                SkyManager.Instance["Asteroid"] = new Events.AsteroidSky();
+                LoadShaders();
             }
+
             On_FilterManager.EndCapture += FilterManager_EndCapture;
             On_Main.LoadWorlds += new Terraria.On_Main.hook_LoadWorlds(Main_LoadWorlds);
             On_Player.SetTalkNPC += Player_SetTalkNPC;
             Main.OnResolutionChanged += Main_OnResolutionChanged;
             On_Main.DrawProjectiles += DrawProj;
+
+            StarryDrawCache ??= [];
         }
+
+        private void LoadShaders()
+        {
+            PurpleCometEffect = Instance.Assets.Request<Effect>("Assets/Effects/PurpleComet", AssetRequestMode.ImmediateLoad).Value;
+            BloomEffect = Instance.Assets.Request<Effect>("Assets/Effects/bloom", AssetRequestMode.ImmediateLoad).Value;
+            BlurEffect = Instance.Assets.Request<Effect>("Assets/Effects/blur", AssetRequestMode.ImmediateLoad).Value;
+            Tentacle = Instance.Assets.Request<Effect>("Assets/Effects/Tentacle", AssetRequestMode.ImmediateLoad).Value;
+            TrailShader = Instance.Assets.Request<Effect>("Assets/Effects/TrailShader", AssetRequestMode.ImmediateLoad).Value;
+            RTAlpha = Instance.Assets.Request<Effect>("Assets/Effects/RTAlpha", AssetRequestMode.ImmediateLoad).Value;
+            RTOutline = Instance.Assets.Request<Effect>("Assets/Effects/RTOutline", AssetRequestMode.ImmediateLoad).Value;
+            PullingForce = Instance.Assets.Request<Effect>("Assets/Effects/PullingForce", AssetRequestMode.ImmediateLoad).Value;
+            metaballGradient = Instance.Assets.Request<Effect>("Assets/Effects/metaballGradient", AssetRequestMode.ImmediateLoad).Value;
+            SpriteRotation = Instance.Assets.Request<Effect>("Assets/Effects/spriteRotation", AssetRequestMode.ImmediateLoad).Value;
+            metaballGradientNoiseTex = Instance.Assets.Request<Effect>("Assets/Effects/metaballGradientNoiseTex", AssetRequestMode.ImmediateLoad).Value;
+            textureDisplacementWGradients = Instance.Assets.Request<Effect>("Assets/Effects/textureDisplacementWGradients", AssetRequestMode.ImmediateLoad).Value;
+            displacementMap = Instance.Assets.Request<Effect>("Assets/Effects/displacementMap", AssetRequestMode.ImmediateLoad).Value;
+
+            Bloom2 = Instance.Assets.Request<Effect>("Assets/Effects/Bloom2", AssetRequestMode.ImmediateLoad).Value;
+            MeleeTrail = Instance.Assets.Request<Effect>("Assets/Effects/MeleeTrail", AssetRequestMode.ImmediateLoad).Value;
+            FadedMeleeTrail = Instance.Assets.Request<Effect>("Assets/Effects/FadedMeleeTrail", AssetRequestMode.ImmediateLoad).Value; 
+
+            //ScreenDistort = Instance.Assets.Request<Effect>("Assets/Effects/DistortMove", AssetRequestMode.ImmediateLoad).Value;
+            Filters.Scene["PurpleComet"] = new Filter(new ScreenShaderData(new Ref<Effect>(PurpleCometEffect), "ModdersToolkitShaderPass"), EffectPriority.VeryHigh);
+            SkyManager.Instance["PurpleComet"] = new Events.PurpleCometSky();
+
+            Filters.Scene["Asteroid"] = new Filter(new ScreenShaderData("FilterMiniTower").UseColor(0f, 0f, 0f).UseOpacity(0f), EffectPriority.VeryHigh);
+            SkyManager.Instance["Asteroid"] = new Events.AsteroidSky();
+        }
+
         private void Player_SetTalkNPC(Terraria.On_Player.orig_SetTalkNPC orig, Player self, int npcIndex, bool fromNet)
         {
             if (npcIndex == NPCType<Starine_Symbol>())
@@ -604,6 +635,7 @@ namespace MythosOfMoonlight
                         render[i] = new RenderTarget2D(gd, gd.PresentationParameters.BackBufferWidth, gd.PresentationParameters.BackBufferHeight, false, gd.PresentationParameters.BackBufferFormat, 0);
                 }
         }
+
         void DrawProj(On_Main.orig_DrawProjectiles orig, Main self)
         {
             GraphicsDevice gd = Main.graphics.GraphicsDevice;
@@ -619,8 +651,18 @@ namespace MythosOfMoonlight
                 gd.SetRenderTarget(render[0]);
                 gd.Clear(Color.Transparent);
                 sb.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+
                 Starry2.DrawAll(Main.spriteBatch);
                 Starry.DrawAll(Main.spriteBatch);
+                StarryStretchyGlow.DrawAllWithStarryEffect(Main.spriteBatch);
+
+                foreach (Action drawAction in StarryDrawCache)
+                {
+                    drawAction?.Invoke(); //anything can be drawn using the magic
+                }
+
+                StarryDrawCache?.Clear();
+
                 sb.End();
 
                 gd.SetRenderTarget(render[1]);
@@ -656,10 +698,12 @@ namespace MythosOfMoonlight
                 RTOutline.Parameters["colStart"].SetValue(Color.Black.ToVector4());
                 RTOutline.Parameters["useMainAlpha"].SetValue(false);
                 RTOutline.Parameters["offset"].SetValue(new Vector2(Main.GlobalTimeWrappedHourly * 0.1f, 0));
+
                 sb.Draw(render[0], Vector2.Zero, Color.White);
 
-                gd.Textures[1] = Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/jungleDustColor", (AssetRequestMode)1).Value;
+                gd.Textures[1] = Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/jungleDustColor", AssetRequestMode.ImmediateLoad).Value;
                 metaballGradient.CurrentTechnique.Passes[0].Apply();
+
                 sb.Draw(render[1], Vector2.Zero, Color.White);
 
                 gd.Textures[1] = Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Gradients/coldwindGradient", (AssetRequestMode)1).Value;
@@ -682,6 +726,7 @@ namespace MythosOfMoonlight
             }
             orig(self);
         }
+      
         private void FilterManager_EndCapture(Terraria.Graphics.Effects.On_FilterManager.orig_EndCapture orig, FilterManager self, RenderTarget2D finalTexture, RenderTarget2D screenTarget1, RenderTarget2D screenTarget2, Color clearColor)
         {
             GraphicsDevice gd = Main.graphics.GraphicsDevice;
@@ -757,22 +802,32 @@ namespace MythosOfMoonlight
             gd.SetRenderTarget(null);
             orig.Invoke(self, finalTexture, screenTarget1, screenTarget2, clearColor);
         }
+      
         public static List<int> projectileFinalDrawList = new List<int>();
+        
         private void DustTrail(GraphicsDevice graphicsDevice)
         {
             graphicsDevice.SetRenderTarget(Main.screenTargetSwap);
             graphicsDevice.Clear(Color.Transparent);
+
             Main.spriteBatch.Begin(0, BlendState.AlphaBlend);
+
             Main.spriteBatch.Draw(Main.screenTarget, Vector2.Zero, Color.White);
+
             Main.spriteBatch.End();
+
             graphicsDevice.SetRenderTarget(OrigRender);
             graphicsDevice.Clear(Color.Transparent);
+
             Main.spriteBatch.Begin((SpriteSortMode)1, BlendState.AlphaBlend);
             Main.spriteBatch.Draw(Main.screenTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, 0, 0f);
             Main.spriteBatch.End();
+
             graphicsDevice.SetRenderTarget(DustTrail1);
             graphicsDevice.Clear(Color.Transparent);
+
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+           
             foreach (Dust dust in Main.dust)
             {
                 if (dust.type == DustType<StarineDust>() && dust.velocity.Length() > 0 && dust.active)
@@ -783,14 +838,20 @@ namespace MythosOfMoonlight
                     }
                 }
             }
+
             Main.spriteBatch.End();
+
             graphicsDevice.SetRenderTarget(Main.screenTarget);
             graphicsDevice.Clear(Color.Transparent);
+
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive);
+
             Main.spriteBatch.Draw(OrigRender, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, 0, 0f);
             Main.spriteBatch.Draw(DustTrail1, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, 0, 0f);
+
             Main.spriteBatch.End();
         }
+      
         /*public override void UpdateMusic(ref int music, ref MusicPriority priority) // Put this in a ModSceneEffect thing
         {
             if (PurpleCometEvent.PurpleComet && Main.LocalPlayer.ZoneOverworldHeight)
@@ -813,6 +874,7 @@ namespace MythosOfMoonlight
             public float Scale;
             public bool Fade;
         }
+
         Particle[] particles;
         /*public override void OnDeselected()
         {

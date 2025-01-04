@@ -18,6 +18,7 @@ namespace MythosOfMoonlight.Events
         public float Intensity;
         int innerSeed = 0, innerSeed2 = 0, outerSeed = 0;
         float mainAlpha, progress, yOffset;
+
         public override void Activate(Vector2 position, params object[] args)
         {
             innerSeed = Main.rand.Next(int.MaxValue);
@@ -27,24 +28,29 @@ namespace MythosOfMoonlight.Events
             linesGlowInner2 = -0.5f;
             isActive = true;
         }
+
         public override void Deactivate(params object[] args)
         {
             isActive = false;
         }
+
         public override void Reset()
         {
             isActive = false;
         }
+
         public override void Update(GameTime gameTime)
         {
             if (isActive)
             {
                 Intensity = Math.Min(1f, 0.01f + Intensity);
             }
+
             else
             {
                 Intensity = Math.Max(0f, Intensity - 0.01f);
             }
+
             progress = Ease(MathHelper.SmoothStep(0, 2, (float)(Main.time) / ((float)Main.nightLength)));
             mainAlpha = MathHelper.Clamp((float)Math.Sin(progress * Math.PI * 0.5f), 0, 1);
             float _progress = MathHelper.SmoothStep(0, 1, (float)(Main.time) / ((float)Main.nightLength));
@@ -125,8 +131,10 @@ namespace MythosOfMoonlight.Events
                 spriteBatch.Draw(starTex2, cometP + starOffset, null, Color.DarkViolet * mainAlpha * mainAlpha * Intensity * 0.1f * ((((float)Math.Sin((double)Main.GlobalTimeWrappedHourly) + 1) * 0.7f) + 0.4f + glow), Main.GameUpdateCount * -0.001f, starTex2.Size() / 2, 0.32f + scaleAdd, SpriteEffects.None, 0f);
                 DrawShine(cometP + starOffset);
             }
+
             spriteBatch.Reload(BlendState.AlphaBlend);
         }
+
         void DrawTrail()
         {
             float scaleAdd = mainAlpha * 0.025f;
@@ -134,6 +142,7 @@ namespace MythosOfMoonlight.Events
             float trailLength = 170 * mainAlpha * mainAlpha;
             Vector2 starOffset = new Vector2(35, -14f);
             float s = 1f;
+
             for (float i = 0; i < trailLength; i++)
             {
                 float inverse_S = Ease(MathHelper.Lerp(mainAlpha, 0, s));
@@ -155,6 +164,7 @@ namespace MythosOfMoonlight.Events
                 }
             }
         }
+
         void DrawShine(Vector2 pos)
         {
             float scaleAdd = mainAlpha * 0.1f;

@@ -25,7 +25,7 @@ namespace MythosOfMoonlight.Common.Utilities
 
             List<int> types = new List<int>()
         {
-            ModContent.ItemType<CDGIris>(), ModContent.ItemType<PlantGun>(), ModContent.ItemType<GalactiteOre>()
+            ModContent.ItemType<PlantGun>(), ModContent.ItemType<GalactiteOre>()
         };
             if (drawInfo.heldItem != null)
                 if (types.Contains(drawInfo.heldItem.type) && !drawInfo.drawPlayer.ItemTimeIsZero)

@@ -65,6 +65,7 @@ namespace MythosOfMoonlight.Common.Systems
                 FieldSpawnRateNPC.rateDecrease = false;
                 FieldSpawnRateNPC.activeNPC = -1;
             }
+
             if (!NPC.AnyNPCs(ModContent.NPCType<Starine_Symbol>()))
             {
                 if (Main.dayTime)
@@ -95,6 +96,7 @@ namespace MythosOfMoonlight.Common.Systems
                 else
                     hasChecked = false;
             }
+
             if (!Main.dayTime && PurpleCometEvent.PurpleComet)
             {
                 galactiteReady = false;
@@ -110,6 +112,7 @@ namespace MythosOfMoonlight.Common.Systems
                     }
                 }
             }
+
             else if (!PurpleCometEvent.PurpleComet)
             {
                 if (!galactiteReady)
