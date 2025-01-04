@@ -464,13 +464,13 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                             {
                                 for(int i = 0; i < 14; i++)
                                 {
-                                    Vector2 pos = NPC.Center + Main.rand.NextVector2CircularEdge(55f, 55f);
+                                    Vector2 pos = NPC.Center + Main.rand.NextVector2CircularEdge(55f, 55f) + new Vector2(0f, 20f);
                                     Vector2 vel = pos.DirectionTo(NPC.Center) * Main.rand.NextFloat(3.6f, 5.2f);
 
                                     Color particleColor = Color.Lerp(Color.LimeGreen, Color.Green, Main.rand.NextFloat(1f));
 
                                     ParticleHandler.SpawnParticle(
-                                    new GlowyBall(pos, vel.RotatedByRandom(Pi / 20f), particleColor, Color.Lerp(particleColor, Color.White, 0.12f), 43, 0.958f, -0.62f, Main.rand.NextFloat(0.52f, 1.05f), 0f, Vector2.One, 0.94f, 0.005f)
+                                    new GlowyBall(pos, vel.RotatedByRandom(Pi / 20f), particleColor, Color.Lerp(particleColor, Color.White, 0.12f), 38, 0.958f, -0.62f, Main.rand.NextFloat(0.52f, 1.05f), 0f, Vector2.One, 0.94f, 0.005f)
                                     {
                                         BloomColor = particleColor,
                                         DrawWithBloom = true,
@@ -478,7 +478,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                                 }
 
                                 ParticleHandler.SpawnParticle(
-                                new Shockwave(NPC.Center, Vector2.Zero, Color.Lerp(Color.LimeGreen, Color.ForestGreen, Main.rand.NextFloat(1f)) * 0.87f, 0f, 0.25f, 0f, Vector2.One, 30)
+                                new Shockwave(NPC.Center + new Vector2(0f, 20f), Vector2.Zero, Color.Lerp(Color.LimeGreen, Color.ForestGreen, Main.rand.NextFloat(1f)) * 0.87f, 0f, 0.25f, 0f, Vector2.One, 30)
                                 {
                                     BloomColor = Color.LightGreen,
                                     DrawWithBloom = true,
