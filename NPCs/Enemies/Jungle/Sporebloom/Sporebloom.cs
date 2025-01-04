@@ -1,4 +1,5 @@
-﻿using MythosOfMoonlight.Common.Crossmod;
+﻿using log4net.Util;
+using MythosOfMoonlight.Common.Crossmod;
 using MythosOfMoonlight.Common.Graphics.MoMParticles;
 using MythosOfMoonlight.Common.Graphics.MoMParticles.Types;
 using MythosOfMoonlight.Common.Systems;
@@ -253,6 +254,8 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                     });
                 }
 
+                NPC.rotation = Lerp(NPC.rotation, NPC.velocity.X * 0.11815f, 0.1f);
+
                 if (CurrentBehaviour == Behaviour.Idle) //wander around aimlessly, do not use the player as a target for anything!!
                 {
                     if (Logic[5] == 0f)
@@ -261,10 +264,18 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
 
                         for (int i = 0; i < 100; i++)
                         {
-                            if (Collision.SolidCollision(targetPosition, NPC.width + 10, NPC.height + 10))
+                           // if (Collision.SolidCollision(targetPosition, NPC.width + 10, NPC.height + 10))
+                           // {
+                           //     targetPosition.X += RandomInRange(-300f, 300f, 200f);
+                            //    targetPosition.Y += RandomInRange(-300f, 300f, 100f);
+                            //}
+
+                            if (Collision.CanHitLine(NPC.Center, NPC.width + 10, NPC.height + 10, targetPosition, NPC.width + 10, NPC.height + 10))
                             {
                                 targetPosition.X += RandomInRange(-300f, 300f, 200f);
                                 targetPosition.Y += RandomInRange(-300f, 300f, 100f);
+
+                                targetPosition *= -1.1f;
                             }
 
                             else break;
@@ -279,6 +290,12 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                     Vector2 velocity = NormalizeBetter(destination - NPC.Center).RotatedBy(Logic[4]);
 
                     NPC.velocity = Vector2.Lerp(NPC.velocity, velocity * 0.9f, 0.15f);
+
+                    if (NPC.collideX)
+                        Logic[5] = 0f;
+
+                    if (NPC.collideY)
+                        Logic[5] = 0f;
 
                     if (NPC.Center.X.CloseTo(targetPosition.X, NPC.width + 5f) || NPC.Center.Y.CloseTo(targetPosition.Y, NPC.height + 5f) || Collision.SolidCollision(destination, NPC.width + 10, NPC.height + 10))
                         Logic[5] = 0f;
@@ -295,7 +312,8 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                     }
                 }
 
-                if (CurrentBehaviour == Behaviour.SporeBarf) //blegh
+                //hawk tuah
+                if (CurrentBehaviour == Behaviour.SporeBarf) 
                 {
                     if (++Logic[0] >= 800f) //barf
                     {
@@ -303,6 +321,12 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                         NPC.velocity *= 0.9f;
                         Logic[6] = 0f;
                         Logic[9] = Lerp(Logic[9], 1f, 0.041f);
+
+                        if (Logic[2] == 65f)
+                        {
+                            SoundEngine.PlaySound(new(Texture + "_hawkTuah"), NPC.Center);
+                        }
+
                         if (++Logic[2] >= 90)
                         {
                             Logic[1] = 1f;
@@ -312,7 +336,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                                 for(int i = 0; i < 50; i++)
                                 {
                                     Vector2 pos = NPC.Center + Main.rand.NextVector2Circular(10f, 10f);
-                                    Vector2 vel = Main.rand.NextVector2Circular(3f, 3f) * Main.rand.NextFloat(1.5f, 10f);
+                                    Vector2 vel = -pos.DirectionTo(NPC.Center) * Main.rand.NextFloat(1.5f, 10f);
 
                                     Color particleColor = Color.Lerp(Color.LimeGreen, Color.HotPink, Main.rand.NextFloat(1f));
 
@@ -324,10 +348,25 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                                     });
                                 }
 
-                                for(int i = 0; i < 15; i++)
+                                for (int i = 0; i < 20; i++)
                                 {
-                                    Vector2 pos = NPC.Center + Main.rand.NextVector2Circular(7f, 7f);
-                                    Vector2 vel = Main.rand.NextVector2Circular(1.5f, 1.5f) * Main.rand.NextFloat(0.5f, 1f);
+                                    Vector2 pos = NPC.Center + Main.rand.NextVector2Circular(100f, 100f);
+                                    Vector2 vel = -pos.DirectionTo(NPC.Center) * Main.rand.NextFloat(1.5f, 10f);
+
+                                    Color particleColor = Color.Lerp(Color.LimeGreen, Color.HotPink, Main.rand.NextFloat(1f));
+
+                                    ParticleHandler.SpawnParticle(
+                                    new GlowyBall(pos, vel, particleColor, Color.Lerp(particleColor, Color.White, 0.2f), 130, 0.7f, -0.1f, Main.rand.NextFloat(0.52f, 1.05f), -0.1f, Vector2.One, 0.9f, 0.0025f)
+                                    {
+                                        BloomColor = particleColor,
+                                        DrawWithBloom = true,
+                                    });
+                                }
+
+                                for (int i = 0; i < 8; i++)
+                                {
+                                    Vector2 pos = NPC.Center + Main.rand.NextVector2Circular(3f, 3f);
+                                    Vector2 vel = Main.rand.NextVector2Circular(0.5f, 0.5f) * Main.rand.NextFloat(0.5f, 1f);
 
                                     NPC.SpawnProjectile(pos, vel, ProjectileType<SporebloomSpore>(), NPC.damage, 2f);
                                 }
@@ -366,9 +405,15 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                         Vector2 velocity = NormalizeBetter(pointToMoveTo - NPC.Center);
 
                         float speed = 1f;
-                        speed = Lerp(speed, 15f, 0.18f);
+                        speed = Lerp(speed, 4f, 0.18f);
 
                         NPC.velocity = Vector2.Lerp(NPC.velocity, velocity * speed, (speed / 90f) + 0.035f);
+
+                        if (NPC.collideX)
+                            NPC.velocity.X *= -1.2f;
+
+                        if(NPC.collideY)
+                            NPC.velocity.Y *= -1.2f;
 
                         if (NPC.Center.X.CloseTo(pointToMoveTo.X, 100f) || NPC.Center.Y.CloseTo(pointToMoveTo.Y, 100f))
                             speed *= 0.98f; //slow down
@@ -544,9 +589,9 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
             Projectile.hostile = true;
             Projectile.penetrate = -1;
             Projectile.tileCollide = true;
-            Projectile.timeLeft = 500;
-            Projectile.Opacity = 0f;
+            Projectile.timeLeft = 700;
             Main.projFrames[Type] = 3;
+            Projectile.scale = 1f;
         }
 
         public override void AI()
@@ -556,62 +601,38 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                 Projectile.frame = Main.rand.Next(2);
                 Projectile.ai[0] = 1f;
                 Projectile.netUpdate = true;
-                Projectile.scale = 0f;
+                Projectile.alpha = 50;
             }
 
             else
             {
-                if (Projectile.timeLeft < 90)
-                    lerpToZero = true;
+                Main.NewText(Projectile.alpha);
 
-                if (lerpToZero)
+                if (Projectile.timeLeft < 80)
+                    Projectile.alpha += 2;
+
+                Projectile.alpha += 1;
+
+                if (Projectile.alpha >= 255)
+                    Projectile.Kill();
+
+                Projectile.scale += 0.0034f;
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.Zero, 0.001f);
+                Projectile.rotation += 0.032f * Projectile.velocity.X;
+
+                if (Main.rand.NextBool(6))
                 {
-                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.Zero, 0.38f);
-                    Projectile.Opacity = Lerp(Projectile.Opacity, 0f, 0.051f);
-                    Projectile.scale = Lerp(Projectile.scale, 0f, 0.039f);
+                    Vector2 pos = Projectile.Center + Main.rand.NextVector2CircularEdge(35f, 35f);
+                    Vector2 vel = Main.rand.NextVector2Circular(0.1f, 0.1f);
 
-                    if (Projectile.Opacity.CloseTo(0f, 0.05f))
+                    Color particleColor = Color.Lerp(Color.LightPink, Color.Pink, Main.rand.NextFloat(1f));
+
+                    ParticleHandler.SpawnParticle(
+                    new GlowyBall(pos, vel.RotatedByRandom(Pi / 20f), particleColor, Color.Lerp(particleColor, Color.White, 0.12f), 35, 1f, 0f, 0f, Main.rand.NextFloat(0.52f, 1.05f), Vector2.One, 0.94f, 0.0015f)
                     {
-                        for(int i = 0; i < 5; i++)
-                        {
-                            Vector2 pos = Projectile.Center + Main.rand.NextVector2CircularEdge(5f, 5f);
-                            Vector2 vel = Main.rand.NextVector2Circular(0.8f, 0.8f);
-
-                            Color particleColor = Color.Lerp(Color.LimeGreen, Color.Green, Main.rand.NextFloat(1f));
-
-                            ParticleHandler.SpawnParticle(
-                            new GlowyBall(pos, vel.RotatedByRandom(Pi / 20f), particleColor, Color.Lerp(particleColor, Color.White, 0.12f), 35, 1f, 0f, Main.rand.NextFloat(0.52f, 1.05f), 0f, Vector2.One, 0.94f, 0.0015f)
-                            {
-                                BloomColor = particleColor,
-                                DrawWithBloom = true,
-                            });
-                        }
-
-                        Projectile.Kill();
-                    }
-                }
-
-                else
-                {
-                    Projectile.Opacity = Lerp(Projectile.Opacity, 0.8f, 0.1f);
-                    Projectile.scale = Lerp(Projectile.scale, 1f, 0.09f);
-                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.Zero, 0.01f);
-                    Projectile.rotation += 0.032f * Projectile.velocity.X;
-
-                    if (Main.rand.NextBool(6))
-                    {
-                        Vector2 pos = Projectile.Center + Main.rand.NextVector2CircularEdge(35f, 35f);
-                        Vector2 vel = Main.rand.NextVector2Circular(0.1f, 0.1f);
-
-                        Color particleColor = Color.Lerp(Color.LimeGreen, Color.Green, Main.rand.NextFloat(1f));
-
-                        ParticleHandler.SpawnParticle(
-                        new GlowyBall(pos, vel.RotatedByRandom(Pi / 20f), particleColor, Color.Lerp(particleColor, Color.White, 0.12f), 35, 1f, 0f, 0f, Main.rand.NextFloat(0.52f, 1.05f), Vector2.One, 0.94f, 0.0015f)
-                        {
-                            BloomColor = particleColor,
-                            DrawWithBloom = true,
-                        });
-                    }
+                        BloomColor = particleColor,
+                        DrawWithBloom = true,
+                    });
                 }
             }
         }
@@ -634,7 +655,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
 
         public override void ModifyDamageHitbox(ref Rectangle hitbox)
         {
-           
+            hitbox.Inflate((int)(10f * Projectile.scale), (int)(10f * Projectile.scale));
         }
 
         public override bool PreDraw(ref Color lightColor)
@@ -645,14 +666,16 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
 
             Main.spriteBatch.Reload(BlendState.Additive);
 
-            Projectile.SimpleDrawProjectile(tex, Color.Green * Projectile.Opacity * 0.9f, true, Projectile.scale * 1.2f);
-            Projectile.SimpleDrawProjectile(tex, Color.LightGreen * Projectile.Opacity, true, Projectile.scale);
-            Projectile.SimpleDrawProjectile(tex, Color.LightGreen * Projectile.Opacity * 1.7f, true, Projectile.scale * 0.45f);
+            VFXManager.DrawCache.Add(() =>
+            {
+                Projectile.SimpleDrawProjectile(tex, Color.HotPink * Projectile.Opacity * 0.8f, true, Projectile.scale * 1.1f);
+            });
+
+            Projectile.SimpleDrawProjectile(tex, Color.Pink * Projectile.Opacity, true, Projectile.scale);
 
             VFXManager.DrawCache.Add(() =>
             {
-                Projectile.SimpleDrawProjectile(tex, Color.LightGreen * Projectile.Opacity, true, Projectile.scale);
-                Projectile.SimpleDrawProjectile(tex, Color.LightGreen * Projectile.Opacity * 1.7f, true, Projectile.scale * 0.45f);
+                Projectile.SimpleDrawProjectile(tex, Color.LightPink * Projectile.Opacity * 0.98f, true, Projectile.scale * 0.35f);
             });
 
             Main.spriteBatch.ApplySaved();
