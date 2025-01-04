@@ -105,8 +105,8 @@ namespace MythosOfMoonlight.Projectiles
             Texture2D tex = TextureAssets.Projectile[Type].Value;
             Main.spriteBatch.Reload(BlendState.Additive);
 
-            if (Projectile.velocity == Vector2.Zero && opacity > 0f) //opacity check because it still draws allat when faded, which is an unneeded waste of performance
-                DrawGlowyBeam();
+            //if (Projectile.velocity == Vector2.Zero && opacity > 0f) //opacity check because it still draws allat when faded, which is an unneeded waste of performance
+               // DrawGlowyBeam(); //maybe one day...
 
             for (int i = 0; i < 4; i++)
             {
