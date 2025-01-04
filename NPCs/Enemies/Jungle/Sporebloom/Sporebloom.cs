@@ -73,12 +73,16 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
         {
             for(int i = 0; i < Logic.Length; i++)
                 writer.Write(Logic[i]);
+
+            writer.WriteVector2(targetPosition);
         }
 
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             for (int i = 0; i < Logic.Length; i++)
                 Logic[i] = reader.ReadSingle();
+
+            targetPosition = reader.ReadVector2();
         }
 
         #endregion
@@ -232,6 +236,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
             if (player is null || player.dead || !player.active)
             {
                 CurrentBehaviour = Behaviour.Idle;
+                NPC.netUpdate = true;
             }
 
             else
@@ -283,6 +288,8 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
 
                         Logic[4] = Main.rand.NextFloat(TwoPi);
                         Logic[5] = 1f;
+
+                        NPC.netUpdate = true;
                     }
 
                     Vector2 destination = targetPosition + NPC.velocity * 5f;
@@ -306,6 +313,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                         {
                             ResetAllValues([9]); //save the glow!
                             CurrentBehaviour = Behaviour.SporeBarf;
+                            NPC.netUpdate = true;
                         }
 
                         Logic[0] = 0f;
@@ -377,6 +385,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                                 ResetAllValues([9]);
                                 Logic[6] = 0f;
                                 CurrentBehaviour = Behaviour.FallingDownToRecover;
+                                NPC.netUpdate = true;
                             }
                         }
 
@@ -488,6 +497,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                             NPC.defense = NPC.defDefense;
                             NPC.damage = NPC.defDamage;
                             Logic[6] = 1f;
+                            NPC.netUpdate = true;
                         }
                     }
                 }
