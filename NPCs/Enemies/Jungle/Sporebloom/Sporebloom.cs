@@ -56,7 +56,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
             bestiaryEntry.Info.AddRange(
             [
                 BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.UndergroundJungle,
-                new FlavorTextBestiaryInfoElement("bazinga")
+                new FlavorTextBestiaryInfoElement("plant, plant? plant. plant plant, plant. leaves. SPORES??! jungle.")
             ]);
         }
 
