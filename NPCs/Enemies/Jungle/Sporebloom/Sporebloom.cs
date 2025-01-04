@@ -75,6 +75,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                 writer.Write(Logic[i]);
 
             writer.WriteVector2(targetPosition);
+            writer.Write(NPC.behindTiles);
         }
 
         public override void ReceiveExtraAI(BinaryReader reader)
@@ -83,6 +84,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                 Logic[i] = reader.ReadSingle();
 
             targetPosition = reader.ReadVector2();
+            NPC.behindTiles = reader.ReadBoolean();
         }
 
         #endregion
@@ -98,8 +100,9 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
         /// <br>7:Same here</br>
         /// <br>8:Frameheight check for the barf, to ensure it completes the animation</br>
         /// <br>9:Glow interpolant</br>
+        /// <br>10: draw offset for the roots when healing</br>
         /// </summary>
-        public float[] Logic = new float[10];
+        public float[] Logic = new float[11];
 
         Vector2 targetPosition = Vector2.Zero;
 
@@ -232,6 +235,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
         public override void AI()
         {
             CheckTarget(out Player player);
+            Lighting.AddLight(NPC.Center, new Vector3(.19f, .08f, .11f));
 
             if (player is null || player.dead || !player.active)
             {
@@ -263,6 +267,8 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
 
                 if (CurrentBehaviour == Behaviour.Idle) //wander around aimlessly, do not use the player as a target for anything!!
                 {
+                    Logic[10] = Lerp(Logic[10], 0f, 0.13f);
+
                     if (Logic[5] == 0f)
                     {
                         targetPosition = NPC.Center + new Vector2(RandomInRange(-500f, 500f, 250f), RandomInRange(-600f, 600f, 300f));
@@ -440,6 +446,8 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                     NPC.knockBackResist = 0f;
                     NPC.defense = 0;
                     NPC.damage = 0;
+                    NPC.behindTiles = true;
+
                     if (Logic[0] <= 500f) //fall, then heal a bit.
                     {
                         if (!NPC.collideY)
@@ -451,7 +459,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                         if (NPC.collideY || NPC.velocity.Y == 0f)
                         {
                             Logic[0]++;
-
+                            Logic[10] = Lerp(Logic[10], 13f, 0.13f);
                             if (Logic[0] % 45 == 0 && NPC.life < NPC.lifeMax)
                             {
                                 for(int i = 0; i < 14; i++)
@@ -497,6 +505,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                             NPC.defense = NPC.defDefense;
                             NPC.damage = NPC.defDamage;
                             Logic[6] = 1f;
+                            NPC.behindTiles = false;
                             NPC.netUpdate = true;
                         }
                     }
@@ -577,9 +586,11 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
             texGlow ??= Request<Texture2D>($"{Texture}" + "_Glow").Value;
             texGlow2 ??= Request<Texture2D>($"{Texture}" + "_Glow2").Value;
 
-            NPC.SimpleDrawNPC(tex, screenPos, drawColor, false, 1f);
-            NPC.SimpleDrawNPC(texGlow2, screenPos, Color.White, true, 1f);
-            NPC.SimpleDrawNPC(texGlow, screenPos, Color.White * Logic[9], true, 1f);
+            Vector2 offsetRoots = new Vector2(0f, Logic[10]);
+
+            NPC.SimpleDrawNPC(tex, offsetRoots, screenPos, drawColor, false, 1f);
+            NPC.SimpleDrawNPC(texGlow2, offsetRoots, screenPos, Color.White, true, 1f);
+            NPC.SimpleDrawNPC(texGlow, offsetRoots, screenPos, Color.White * Logic[9], true, 1f);
 
             return false;
         }
