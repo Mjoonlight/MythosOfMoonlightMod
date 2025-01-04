@@ -150,7 +150,7 @@ namespace MythosOfMoonlight
         {
             if (Star.starfallBoost >= 2 ? Main.rand.NextBool(8500) : false && !Main.dayTime)
             {
-                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center + new Vector2(1920 * Main.rand.NextFloat() - 960, -3000), new Vector2(Main.rand.NextFloat(-1, 1), 20f), ModContent.ProjectileType<FallingStarBig>(), 2000, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center + new Vector2(1920 * Main.rand.NextFloat() - 960, -3000), new Vector2(Main.rand.NextFloat(-1, 1), 32f), ModContent.ProjectileType<FallingStarBig>(), 2000, 0);
             }
             if (Main.rand.NextBool(Star.starfallBoost >= 2 ? 300 : 10000) && !Main.dayTime)
             {

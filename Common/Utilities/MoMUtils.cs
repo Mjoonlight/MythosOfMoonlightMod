@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static MythosOfMoonlight.Helper;
 
 namespace MythosOfMoonlight.Common.Utilities
 {
@@ -152,6 +153,47 @@ namespace MythosOfMoonlight.Common.Utilities
                 f[index] = 0f;
         }
 
+        public static void SimpleHealNPC(this NPC n, int healAmount)
+        {
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+            {
+                if (n.life < n.lifeMax && healAmount > 0)
+                {
+                    n.HealEffect(healAmount);
+                    n.life += healAmount;
+                    n.netUpdate = true;
+                }
+            }
+        }
+
+        public static bool CloseTo(this Vector2 vec, Vector2 target, float xRange = 0f, float yRange = 0f)
+        {
+            return (vec.X > target.X - xRange && vec.X < target.X + xRange) && (vec.Y > target.Y - yRange && vec.Y < target.Y + yRange);
+        }
+
+        public static float RandomInRange(float min, float max, float exclusionRange)
+        {
+            //-20, 20
+            //range is 10, return either < -10 or > 10
+
+            float f = Main.rand.NextFloat(min, max + 1f);
+
+            int sign = Sign(f);
+
+            if (f < exclusionRange * sign)
+                f = exclusionRange * sign;
+
+            return f;
+        }
+
+        public static void SpawnProjectile(this NPC npc, Vector2 pos, Vector2 vel, int type, float damage, float kb, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f)
+        {
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+            {
+                Projectile.NewProjectile(npc.GetSource_FromAI(), pos, vel, type, (int)damage, kb, Main.myPlayer, ai0, ai1, ai2);
+            }
+        }
+
         public static Projectile SpawnProjectle(Player owner, int type, Vector2 pos, Vector2 vel, float damage, float knockBack, bool condition = true, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f)
         {
             return condition ? Projectile.NewProjectileDirect(owner.GetSource_FromThis(), pos, vel, type, (int)damage, knockBack, owner.whoAmI, ai0, ai1, ai2) : null;
@@ -159,7 +201,7 @@ namespace MythosOfMoonlight.Common.Utilities
 
         public static Color PickRandom(Color[] options) => options[Main.rand.Next(options.Length)];
 
-        public static void DrawSimpleTrail(this Projectile Projectile, Texture2D texture, Vector2 scale, Color startColor, Color endColor, float extraRot = 0f)
+        public static void SimpleDrawTrail(this Projectile Projectile, Texture2D texture, Vector2 scale, Color startColor, Color endColor, float extraRot = 0f)
         {
             Texture2D afterimageTexture = texture;
 
@@ -180,6 +222,48 @@ namespace MythosOfMoonlight.Common.Utilities
 
                 Main.EntitySpriteDraw(afterimageTexture, center - Main.screenPosition + new Vector2(0, Projectile.gfxOffY), null, color, rot, afterimageTexture.Size() / 2f, scale * Projectile.scale, SpriteEffects.None, 0);
             }
+        }
+
+        public static void SimpleDrawNPC(this NPC npc, Texture2D texture, Vector2 screenPos, Color drawColor, bool glow, float scale = 1f, float rotationAdd = 0f)
+        {
+            SpriteEffects spriteEffects = npc.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+
+            Vector2 drawPos = npc.Center - screenPos;
+            Vector2 halfSizeTexture = new Vector2((float)(texture.Width / 2), (float)(texture.Height / Main.npcFrameCount[npc.type] / 2));
+
+            drawPos -= new Vector2((float)texture.Width, (float)(texture.Height / Main.npcFrameCount[npc.type])) * 1f / 2f;
+            drawPos += halfSizeTexture * 1f + new Vector2(0f, 4f + npc.gfxOffY);
+
+            Main.EntitySpriteDraw(texture, drawPos, new Microsoft.Xna.Framework.Rectangle?(npc.frame), glow ? drawColor : npc.GetAlpha(drawColor), npc.rotation + rotationAdd, halfSizeTexture, npc.scale * scale, spriteEffects, 0);
+        }
+
+        public static void SimpleDrawNPC(this NPC npc, Texture2D texture, Vector2 screenPos, Color drawColor, bool glow, Vector2 scale = default, float rotationAdd = 0f)
+        {
+            SpriteEffects spriteEffects = npc.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+
+            Vector2 drawPos = npc.Center - screenPos;
+            Vector2 halfSizeTexture = new Vector2((float)(texture.Width / 2), (float)(texture.Height / Main.npcFrameCount[npc.type] / 2));
+
+            drawPos -= new Vector2((float)texture.Width, (float)(texture.Height / Main.npcFrameCount[npc.type])) * 1f / 2f;
+            drawPos += halfSizeTexture * 1f + new Vector2(0f, 4f + npc.gfxOffY);
+
+            if (scale == default)
+                scale = Vector2.One;
+
+            Main.EntitySpriteDraw(texture, drawPos, new Microsoft.Xna.Framework.Rectangle?(npc.frame), glow ? drawColor : npc.GetAlpha(drawColor), npc.rotation + rotationAdd, halfSizeTexture, npc.scale * scale, spriteEffects, 0);
+        }
+
+        public static void SimpleDrawNPC(this NPC npc, Texture2D texture, Vector2 offset, Vector2 screenPos, Color drawColor, bool glow, float scale = 1f, float rotationAdd = 0f)
+        {
+            SpriteEffects spriteEffects = npc.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+
+            Vector2 drawPos = npc.Center - screenPos;
+            Vector2 halfSizeTexture = new Vector2((float)(texture.Width / 2), (float)(texture.Height / Main.npcFrameCount[npc.type] / 2));
+
+            drawPos -= new Vector2((float)texture.Width, (float)(texture.Height / Main.npcFrameCount[npc.type])) * 1f / 2f;
+            drawPos += halfSizeTexture * 1f + new Vector2(0f, 4f + npc.gfxOffY);
+
+            Main.EntitySpriteDraw(texture, drawPos + offset, new Microsoft.Xna.Framework.Rectangle?(npc.frame), glow ? drawColor : npc.GetAlpha(drawColor), npc.rotation + rotationAdd, halfSizeTexture, npc.scale * scale, spriteEffects, 0);
         }
 
         public static void SimpleDrawProjectile(this Projectile Projectile, Texture2D texture, Color Color, bool IsGlow, float scaleMod = 1f, float extraRot = 0f)

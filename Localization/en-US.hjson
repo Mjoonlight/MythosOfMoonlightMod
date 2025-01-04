@@ -617,6 +617,8 @@ Mods: {
 			RustyWaraxeSwing.DisplayName: Rusty Waraxe Swing
 			StarThrowerProj.DisplayName: Star Thrower Proj
 			StarryFire.DisplayName: Starry Fire
+			SporeBloomSpore.DisplayName: Spore Bloom Spore
+			SporebloomSpore.DisplayName: Sporebloom Spore
 		}
 
 		NPCs: {
@@ -656,6 +658,7 @@ Mods: {
 			StarveiledScholar.DisplayName: Nightveiled Scholar
 			Moonborn.DisplayName: Moonborn
 			FallingStar.DisplayName: Falling Star
+			Sporebloom.DisplayName: Sporebloom
 		}
 
 		Tiles: {

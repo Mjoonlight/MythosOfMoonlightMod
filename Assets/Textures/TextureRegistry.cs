@@ -9,7 +9,7 @@ namespace MythosOfMoonlight.Assets.Textures
     public class TextureRegistry : ModSystem
     {
         public static Texture2D GlowSuperSmall;
-
+        public static Texture2D Shockwave;
         public override void Load() => LoadAll();
 
         public override void PostSetupContent() => LoadAll();
@@ -20,6 +20,7 @@ namespace MythosOfMoonlight.Assets.Textures
             const string extrasPath = basePath + "Extra/";
 
             GlowSuperSmall = Request<Texture2D>(extrasPath + "GlowSuperSmall").Value;
+            Shockwave = Request<Texture2D>(extrasPath + "Shockwave").Value;
         }
     }
 }
