@@ -456,7 +456,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                             NPC.velocity.X *= 0.95f;
                         }
 
-                        if (NPC.collideY || NPC.velocity.Y == 0f)
+                        if (NPC.collideY || Collision.SolidCollision(NPC.Center, 0, NPC.height))
                         {
                             Logic[0]++;
                             Logic[10] = Lerp(Logic[10], 13f, 0.13f);
@@ -484,7 +484,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
                                     DrawWithBloom = true,
                                 });
 
-                                NPC.SimpleHealNPC(NPC.lifeMax / 30);
+                                NPC.SimpleHealNPC(NPC.lifeMax / 120);
                             }
 
                             if (NPC.life >= NPC.lifeMax && Logic[0] >= 200) //end early if full on hp
