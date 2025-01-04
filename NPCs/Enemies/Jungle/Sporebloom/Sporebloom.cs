@@ -56,7 +56,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
             bestiaryEntry.Info.AddRange(
             [
                 BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.UndergroundJungle,
-                new FlavorTextBestiaryInfoElement("plant, plant? plant. plant plant, plant. leaves. SPORES??! jungle.")
+                new FlavorTextBestiaryInfoElement("One of the many hazardous plants of the underground jungle. It floats with the help of its balloon-like bulb, filled with poisonous spores that it spreads when in the vicinity of other living things.")
             ]);
         }
 
