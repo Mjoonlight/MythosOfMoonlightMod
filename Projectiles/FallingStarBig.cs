@@ -360,15 +360,19 @@ namespace MythosOfMoonlight.Projectiles
             NPC.lifeMax = 200;
             NPC.aiStyle = -1;
             NPC.knockBackResist = 0f;
+
+            NPCID.Sets.ImmuneToAllBuffs[Type] = true;
         }
         public override bool CheckActive()
         {
             return false;
         }
+
         List<int> GoreTypes = new List<int>()
         {
             ModContent.GoreType<StarG0>(),ModContent.GoreType<StarG1>(),ModContent.GoreType<StarG2>(),ModContent.GoreType<StarG3>(),ModContent.GoreType<StarG4>(),ModContent.GoreType<StarG5>(),ModContent.GoreType<StarG6>(),
         };
+
         public override bool CheckDead()
         {
             Projectile projectile = Main.projectile[(int)NPC.ai[0]];
@@ -379,16 +383,16 @@ namespace MythosOfMoonlight.Projectiles
                 Gore.NewGore(default, NPC.Center, Main.rand.NextVector2Circular(10, 10), Main.rand.Next(GoreTypes));
             return true;
         }
+
         public override void HitEffect(NPC.HitInfo hit)
         {
             SoundEngine.PlaySound(SoundID.DD2_WitherBeastHurt, NPC.Center);
             if (Main.rand.NextBool(3))
                 Gore.NewGore(default, NPC.Center, Main.rand.NextVector2Circular(10, 10), Main.rand.Next(GoreTypes));
             Color newColor7 = Color.CornflowerBlue;
+            
             if (Main.rand.NextBool(3))
             {
-
-
                 for (int num613 = 0; num613 < 5; num613++)
                 {
                     Dust.NewDust(NPC.position, NPC.width, NPC.height, 58, 4, 4, 150, default, 0.8f);

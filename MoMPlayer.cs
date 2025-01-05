@@ -31,6 +31,7 @@ namespace MythosOfMoonlight
         public int GoldenTipI;
         public bool StarBitShot = false, GoldenTip = false, Coldwind = false;
         public float ColdwindTimer = 0f;
+
         public override void OnEnterWorld()
         {
             ColdwindTimer = 0f;
@@ -52,6 +53,7 @@ namespace MythosOfMoonlight
                 }
             }
         }
+
         public override void ResetEffects()
         {
             StarBitShot = false;
@@ -75,6 +77,7 @@ namespace MythosOfMoonlight
                 }
             }
         }
+
         Vector2 location2 = new Vector2(0, 0);
 
         public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
@@ -119,6 +122,7 @@ namespace MythosOfMoonlight
 
             }
         }
+
         public override void OnHurt(Player.HurtInfo info)
         {
             if (Coldwind)
@@ -127,7 +131,6 @@ namespace MythosOfMoonlight
 
         public override void UpdateBadLifeRegen()
         {
-
             if (Coldwind)
             {
                 ColdwindTimer++;
@@ -137,6 +140,7 @@ namespace MythosOfMoonlight
                     ColdwindTimer = 0;
                 }
             }
+
             else
                 ColdwindTimer = 0;
         }
@@ -148,16 +152,21 @@ namespace MythosOfMoonlight
         }
         public override void PostUpdate()
         {
-            if (Star.starfallBoost >= 2 ? Main.rand.NextBool(8500) : false && !Main.dayTime)
+            if (Star.starfallBoost >= 2 ? Main.rand.NextBool(9500) : false && !Main.dayTime)
             {
                 Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center + new Vector2(1920 * Main.rand.NextFloat() - 960, -3000), new Vector2(Main.rand.NextFloat(-1, 1), 32f), ModContent.ProjectileType<FallingStarBig>(), 2000, 0);
             }
+
             if (Main.rand.NextBool(Star.starfallBoost >= 2 ? 300 : 10000) && !Main.dayTime)
             {
                 Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center + new Vector2(1920 * Main.rand.NextFloat() - 960, -2500), new Vector2(Main.rand.NextFloat(-10, 10), 20f), ModContent.ProjectileType<FallingStarTiny>(), 10, 0);
             }
+
             if (PurpleCometEvent.PurpleComet)
+            {
+                Player.gravity *= 0.1f; //
                 Player.noFallDmg = true;
+            }
         }
         public override void ModifyScreenPosition()
         {

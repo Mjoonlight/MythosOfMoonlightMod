@@ -719,10 +719,8 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
 
         public override void OnHitPlayer(Player target, Player.HurtInfo info)
         {
-            
+            target.AddBuff(BuffID.Poisoned, 240);
         }
-
-
 
         public override bool OnTileCollide(Vector2 oldVelocity)
         {

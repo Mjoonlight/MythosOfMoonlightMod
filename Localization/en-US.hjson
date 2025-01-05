@@ -474,8 +474,12 @@ Mods: {
 			}
 
 			PlantBow: {
-				DisplayName: Plant Bow
-				Tooltip: ""
+				DisplayName: Spore Bow
+				Tooltip: 
+				'''
+				Fires arrows that leave lingering spore clouds behind it
+				Fired arrows inflict poison for 4 seconds
+				'''
 			}
 		}
 
