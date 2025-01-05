@@ -767,7 +767,8 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
                     b = true;
                 }
 
-                EnactSwing(92f, max2, end, MiscArray[1] + 0.09f, -0.21f * t2, 1400f, t, [SwingEffects, null], -1, -12f);
+                //EnactSwing(92f, max2, end, MiscArray[1] + 0.09f, -0.21f * t2, 1400f, t, [SwingEffects, null], -1, -12f);
+                EnactSwing_Simple(90f, max2, end, -0.21f * t2, t, SwingEffects, null, -1, true);
 
                 if (timer > end)
                     isAttacking = false;
@@ -783,7 +784,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
             {
                 float max = 50f;
                 float max2 = 70f;
-                float end = 105f;
+                float end = 100f;
 
                 float t2 = (timer < max2 + 10 || timer > end - 10) ? 1f : 1.25f;
 
@@ -797,7 +798,8 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
                     PrepareSwing(89f, PiOver2 + Player.direction * 0.67f, t, true, true, -12f);
                 }
 
-                EnactSwing(92f, max2, end, MiscArray[1] + 0.23f, 0.21f, 400f, t, [SwingEffects, null], -1, -13.2f);
+                //EnactSwing(92f, max2, end, MiscArray[1] + 0.23f, 0.21f, 400f, t, [SwingEffects, null], -1, -13.2f);
+                EnactSwing_Simple(90f, max2, end, 0.21f * t2, t, SwingEffects, null, -1, true);
 
                 if (timer > end)
                     isAttacking = false;
@@ -813,7 +815,7 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
             {
                 float max = 40f;
                 float max2 = 50f;
-                float end = 108f;
+                float end = 104f;
 
                 float t2 = (timer < max2 + 10 || timer > end - 15) ? 1f : 1.155f;
 
@@ -827,7 +829,8 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
                     PrepareSwing(89f, PiOver2 - Player.direction * -0.67f, t, true, true, -12f);
                 }
 
-                EnactSwing(92f, max2, end, MiscArray[1] + 0.09f, 0.21f * t2, 1400f, t, [SwingEffects, SwingEffects], 76f, -15.2f);
+                //EnactSwing(92f, max2, end, MiscArray[1] + 0.09f, 0.21f * t2, 1400f, t, [SwingEffects, SwingEffects], 76f, -15.2f);
+                EnactSwing_Simple(90f, max2, end, -0.21f * t2, t, SwingEffects, SwingEffects, 76f, true);
 
                 if (timer > end)
                     isAttacking = false;
@@ -857,7 +860,8 @@ namespace MythosOfMoonlight.Items.PurpleComet.Galactite
                     PrepareSwing(97f, PiOver2 + Player.direction * 0.6f, t, true, true, -12f);
                 }
 
-                EnactSwing(108f, max2, end, MiscArray[1] + 0.23f, 0.27f, 400f, t, [SwingEffectsHeavy, null], -1, -13.2f);
+                //EnactSwing(108f, max2, end, MiscArray[1] + 0.23f, 0.27f, 400f, t, [SwingEffectsHeavy, null], -1, -13.2f);
+                EnactSwing_Simple(104f, max2, end, 0.26f * t2, t, SwingEffectsHeavy, null, -1, true);
 
                 if (timer > end)
                     isAttacking = false;
