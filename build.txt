@@ -1,4 +1,4 @@
-displayName = [c/00e6e6:Mythos] of [c/cb68e8:Moonlight]
+displayName = Mythos of Moonlight
 author = Mjoon
 version = 0.1
 includePDB = false

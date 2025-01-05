@@ -224,7 +224,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Vivine
             Helper.SpawnDust(Projectile.position, Projectile.Size, ModContent.DustType<JunglePinkDust>(), Vector2.Zero, 1, dust => dust.noGravity = true);
         }
         public override Color? GetAlpha(Color lightColor) => new Color(255, 255, 255, 100);
-        public override void OnKill(int timeleft)
+        public override void Kill(int timeleft)
         {
             Helper.SpawnDust(Projectile.position, Projectile.Size, ModContent.DustType<JunglePinkDust>(), -Projectile.velocity * .5f, 20, dust => dust.scale = 1.5f);
             SoundEngine.PlaySound(SoundID.NPCHit18);

@@ -55,7 +55,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.CometFlyby.StrandedMartian
             bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
             {
                 new BestiaryPortraitBackgroundProviderPreferenceInfoElement(ModContent.GetInstance<PurpleCometBiome>().ModBiomeBestiaryInfoElement),
-                new FlavorTextBestiaryInfoElement("A martian sent on a scouting mission, who collided with a rogue comet that was unforeseen in its ships course. Determined to survive, it adapted by creating a crystalline substance from the comet's stone known as Iridic Quartz, which sees use widely in its arsenal, alongside an alloy of Martian Steel and Iridic Quartz, known as Iridium. It follows the comet on ground, secretively working on a means to communicate with its home planet once more.")
+                new FlavorTextBestiaryInfoElement("A martian sent on a scouting mission, who collided with a rogue comet that was unforeseen in its ships course. Determined to survive, it adapted by creating a crystalline substance from the comet's stone known as Iridic quartz, which sees use widely in its arsenal, alongside an alloy of Martian steel and Iridic quartz, known as Iridium. It follows the comet on ground, secretively working on a means to communicate to its planet once more.")
             });
         }
         private enum NState
@@ -121,10 +121,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.CometFlyby.StrandedMartian
                     if (Timer % 60 == 0)
                     {
                         SoundEngine.PlaySound(SoundID.Item68, NPC.Center);
-
-                        Vector2 vel = Vector2.Normalize(Main.player[NPC.target].Center + new Vector2(0, -150) - NPC.Center) * 10f;
-
-                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center + vel * 1.5f, vel, ProjectileType<CometEmberMini>(), Main.expertMode ? 6 : 8, 0.075f, NPC.target, Main.player[NPC.target].Center.X >= NPC.Center.X ? 1 : -1);
+                        Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Normalize(Main.player[NPC.target].Center + new Vector2(0, -150) - NPC.Center) * 10f, ModContent.ProjectileType<CometEmberMini>(), Main.expertMode ? 6 : 8, .075f, NPC.target, Main.player[NPC.target].Center.X >= NPC.Center.X ? 1 : -1);
                     }
                     if (!Main.player[NPC.target].active || Main.player[NPC.target].dead || Vector2.Distance(Main.player[NPC.target].Center, NPC.Center) > 400f || Timer > 120)
                     {

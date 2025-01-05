@@ -39,7 +39,7 @@ namespace MythosOfMoonlight.Dusts
         {
             if (!dust.noGravity)
             {
-                dust.velocity.Y += 0.1f; //falls woah
+                dust.velocity.Y += 0.1f;
             }
 
             dust.rotation += 0.1f;

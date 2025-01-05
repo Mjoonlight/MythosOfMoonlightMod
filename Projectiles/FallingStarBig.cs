@@ -18,13 +18,19 @@ using MythosOfMoonlight.Gores;
 using MythosOfMoonlight.Items.Weapons;
 using MythosOfMoonlight.Items.Accessories;
 using MythosOfMoonlight.NPCs.Enemies.Overworld.Asteroid;
-using MythosOfMoonlight.Common.Graphics.MoMParticles;
-using MythosOfMoonlight.Common.Graphics.MoMParticles.Types;
 
 namespace MythosOfMoonlight.Projectiles
 {
+
     public class FallingStarBig : ModProjectile
     {
+        /*public override void SetStaticDefaults()
+        {
+            Main.projFrames[Type] = 6;
+            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 20;
+            ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
+        }*/
+
         public override void SetDefaults()
         {
             Projectile.width = 50;
@@ -38,7 +44,6 @@ namespace MythosOfMoonlight.Projectiles
             Projectile.penetrate = -1;
             Projectile.hide = true;
         }
-
         public override Color? GetAlpha(Color lightColor)
         {
             return Color.White;
@@ -46,34 +51,6 @@ namespace MythosOfMoonlight.Projectiles
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
         {
             behindNPCsAndTiles.Add(index);
-        }
-
-        float opacity = 0f, scaleX = 0f;
-        Texture2D texLine = null;
-        float LengthToEndOfBeam = 3000f;
-        float scaleMod = 1f, scaleModDir = 1f;
-        bool canFade;
-        float orangeInterpolant = 0f;
-        Vector2 startPosition => Projectile.Center;
-        Vector2 endPosition => Projectile.Center - Vector2.UnitY * LengthToEndOfBeam;
-
-        void DrawGlowyBeam()
-        {
-            texLine ??= Request<Texture2D>("MythosOfMoonlight/Assets/Textures/Extra/GlowSuperSmall").Value;
-
-            float distance = startPosition.Distance(endPosition);
-
-            for (float i = 0; i < distance; i += 5f)
-            {
-                float progress = i / (float)distance;
-
-                Vector2 drawPos = Vector2.Lerp(startPosition, endPosition, progress);
-
-                Color outer = Color.Lerp(Color.Yellow, Color.LightYellow, 0.145f);
-
-                Projectile.SimpleDrawProjectile(texLine, drawPos - Main.screenPosition, Color.Lerp(outer, Color.Lerp(Color.Orange, Color.LightYellow, 0.4f), orangeInterpolant) * opacity * (1f - progress) * 0.5f, true, 1f * new Vector2(1.5f * scaleX * (1.4f - progress) * scaleMod, 1.5f), PiOver2);
-                Projectile.SimpleDrawProjectile(texLine, drawPos - Main.screenPosition, Color.Lerp(Color.Lerp(Color.Orange, Color.LightYellow, 0.4f), Color.LightYellow, 1f - orangeInterpolant) * opacity * (1f - progress) * 0.65f, true, 1f * new Vector2(0.5f * scaleX * (1.4f - progress) * scaleMod, 1f), PiOver2);
-            }
         }
 
         public override void PostDraw(Color lightColor)
@@ -91,11 +68,8 @@ namespace MythosOfMoonlight.Projectiles
                 Main.spriteBatch.Draw(tex, Projectile.Center + new Vector2(10).RotatedBy(-Projectile.rotation) - Main.screenPosition, null, Color.DarkSlateBlue * 0.5f * alpha, Projectile.velocity.ToRotation() + MathHelper.PiOver2, new Vector2(tex.Width / 2, tex.Height / 4), 1f, SpriteEffects.None, 0);
                 Main.spriteBatch.Reload(BlendState.AlphaBlend);
             }
-
             Main.spriteBatch.Reload(BlendState.Additive);
-
             Texture2D tex2 = TextureAssets.Projectile[Type].Value;
-
             Main.spriteBatch.Draw(tex2, Projectile.Center - Main.screenPosition, null, Color.White * ((MathF.Sin(Main.GlobalTimeWrappedHourly * 1.5f) + 1) / 2), Projectile.rotation, tex2.Size() / 2, 1f, SpriteEffects.None, 0);
 
             Main.spriteBatch.Reload(BlendState.AlphaBlend);
@@ -104,10 +78,6 @@ namespace MythosOfMoonlight.Projectiles
         {
             Texture2D tex = TextureAssets.Projectile[Type].Value;
             Main.spriteBatch.Reload(BlendState.Additive);
-
-            //if (Projectile.velocity == Vector2.Zero && opacity > 0f) //opacity check because it still draws allat when faded, which is an unneeded waste of performance
-               // DrawGlowyBeam(); //maybe one day...
-
             for (int i = 0; i < 4; i++)
             {
                 float angle = Helper.CircleDividedEqually(i, 4) + Main.GlobalTimeWrappedHourly * 3;
@@ -123,87 +93,16 @@ namespace MythosOfMoonlight.Projectiles
             Main.spriteBatch.Reload(BlendState.AlphaBlend);
             return true;
         }
-
         public override void AI()
         {
             if (Projectile.ai[1]++ % 40 == 0 && Projectile.ai[0] == 0)
                 SoundEngine.PlaySound(SoundID.Item9.WithPitchOffset(Main.rand.NextFloat(-0.2f, -0.15f)), Projectile.Center);
-
-            ProjectileID.Sets.DrawScreenCheckFluff[Type] = 20000;
-
-            if (Main.dayTime)
-            {
-                opacity = Lerp(opacity, 0f, 0.1f);
-                scaleX = Lerp(scaleX, 0f, 0.071f);
-
-                if (scaleX.CloseTo(0f, 0.015f))
-                    Projectile.Kill();
-            }
-
-            else
-            {
-                if (Projectile.velocity == Vector2.Zero)
-                {
-                    if (canFade)
-                    {
-                        opacity = Lerp(opacity, 1f, 0.031f);
-
-                        scaleX = Lerp(scaleX, 1f, 0.1f);
-
-                        if (scaleX >= 0.98f)
-                            scaleMod += 0.003f * scaleModDir;
-
-                        if (scaleMod >= 1.1f || scaleMod <= 0.8f)
-                            scaleModDir *= -1f;
-                    }
-
-                    if (Main.netMode != NetmodeID.Server)
-                    {
-                        foreach (Player player in Main.ActivePlayers)
-                        {
-                            if (player.active && !player.ghost && !player.dead)
-                            {
-                                if (player.Center.Distance(Projectile.Center) < 500f)
-                                {
-                                    opacity = Lerp(opacity, 0f, 0.018f);
-                                    scaleX = Lerp(scaleX, 0f, 0.012f);
-                                    orangeInterpolant = Lerp(orangeInterpolant, 1f, 0.2f);
-                                    canFade = false;
-                                }
-
-                                else
-                                {
-                                    orangeInterpolant = Lerp(orangeInterpolant, 0f, 0.13f);
-                                    canFade = true;
-                                }
-                            }
-                        }
-                    }
-
-                    if (Main.rand.NextBool(3) && canFade)
-                    {
-                        Vector2 pos = Projectile.Center + new Vector2(Main.rand.NextFloat(-25f, 25f), Main.rand.NextFloat(-145f, 0f));
-                        Vector2 vel = -Vector2.UnitY * Main.rand.NextFloat(1.5f, 4f) + Main.rand.NextVector2Circular(2f, 2f);
-
-                        ParticleHandler.SpawnParticle(
-                        new GlowyBall(pos, vel, Color.LightYellow, Color.Yellow, Main.rand.Next(45, 80), opacity * 0.45f, 0f, Main.rand.NextFloat(0.23f, 1.5f), Main.rand.NextFloat(0.3f, 1f), Vector2.One, Main.rand.NextFloat(0.97f, 1.003f), 0.00025f)
-                        {
-                            DrawWithBloom = true,
-                            BloomColor = Color.Yellow,
-
-                        });
-                    }
-                }
-            }
-
+            if (Main.dayTime) Projectile.Kill();
             Projectile.ai[2] = MathHelper.Clamp(Projectile.ai[2] + 0.05f, 1f, 1.5f);
-           
             if (Projectile.ai[2] > 1.49f)
                 Projectile.ai[2] = 1f;
-
             Projectile.timeLeft = 10;
             Projectile.rotation += MathHelper.ToRadians(Math.Clamp(Projectile.velocity.Length(), 0, 5));
-           
             if (Projectile.ai[0] == 1)
             {
                 Projectile.velocity *= 0.75f;
@@ -265,7 +164,6 @@ namespace MythosOfMoonlight.Projectiles
             }
             // just some homing code 
         }
-
         public override void OnKill(int timeLeft)
         {
             for (int num905 = 0; num905 < 10; num905++)
@@ -315,38 +213,16 @@ namespace MythosOfMoonlight.Projectiles
                     Item.NewItem(Projectile.GetSource_Loot(), Projectile.getRect(), ModContent.ItemType<StarBit>());
                     break;
             }
-
             if (Main.rand.NextBool(8))
             {
                 NPC.NewNPCDirect(null, Projectile.Center - new Vector2(0, 1000), ModContent.NPCType<AsteroidWarden>());
             }
-
-            if (canFade)
-            {
-                float distance = startPosition.Distance(endPosition);
-
-                for (float i = 0; i < distance; i += Main.rand.NextFloat(5f, 8f))
-                {
-                    float progress = i / (float)distance;
-
-                    Vector2 pos = Vector2.Lerp(startPosition, endPosition, progress);
-
-                    Vector2 vel = Main.rand.NextVector2Circular(0.2f, 0.2f);
-
-                    ParticleHandler.SpawnParticle(
-                    new GlowyBall(pos, vel, Color.LightYellow, Color.Yellow, Main.rand.Next(45, 80), 0.8f, 0f, 1.5f, 0f, Vector2.One, Main.rand.NextFloat(0.97f, 1.003f), 0.00025f)
-                    {
-                        DrawWithBloom = true,
-                        BloomColor = Color.Yellow,
-
-                    });
-                }
-            }
         }
-
-        public override bool OnTileCollide(Vector2 oldVelocity) => false;
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+            return false;
+        }
     }
-
     public class FallingStar : ModNPC
     {
         public override string Texture => Helper.Empty;

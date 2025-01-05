@@ -42,7 +42,6 @@ namespace MythosOfMoonlight.Tiles
             yield return new Item(ModContent.ItemType<GalactiteOre>());
         }
     }
-
     public class GalactiteManuallyPlaced : ModTile
     {
         public override string Texture => "MythosOfMoonlight/Tiles/Galactite";

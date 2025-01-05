@@ -50,7 +50,6 @@ namespace MythosOfMoonlight.Items.Weapons.Ranged
             return player.ownedProjectileCounts[Item.shoot] < 1;
         }
     }
-
     public class StarcallerP : ModProjectile
     {
         const float holdOffset = 20;

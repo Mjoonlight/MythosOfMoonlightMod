@@ -59,7 +59,6 @@ namespace MythosOfMoonlight.Common.BiomeManager
                 {
                     Particle.Spawn<PurpurineParticle>(Main.screenPosition + Main.rand.NextVector2FromRectangle(new Rectangle(0, 0, Main.screenWidth * 2, Main.screenHeight * 2)), Main.rand.NextVector2Circular(3, 3), Color.White);
                 }
-
                 player.gravity = .2f;
                 player.maxFallSpeed *= .75f;
             }

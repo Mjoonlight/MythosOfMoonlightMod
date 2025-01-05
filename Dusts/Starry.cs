@@ -31,7 +31,6 @@ namespace MythosOfMoonlight.Dusts
                 dust.active = false;
             return false;
         }
-
         public static void DrawAll(SpriteBatch sb)
         {
             foreach (Dust d in Main.dust)
@@ -46,7 +45,6 @@ namespace MythosOfMoonlight.Dusts
             }
         }
     }
-
     public class Starry2 : ModDust
     {
         public override string Texture => Helper.Empty;

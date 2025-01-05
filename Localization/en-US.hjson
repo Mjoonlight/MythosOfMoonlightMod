@@ -25,7 +25,7 @@ Mods: {
 
 			RustyCut: {
 				DisplayName: Rusty Cut
-				Description: Better get your tetanus shot!
+				Description: Ouch
 			}
 
 			BlinkrootB: {
@@ -41,16 +41,6 @@ Mods: {
 			CommunicatorIrisB: {
 				DisplayName: Communicator Iris B
 				Description: Mods.MythosOfMoonlight.Buffs.CommunicatorIrisB.Description
-			}
-
-			StarlashBuff: {
-				DisplayName: Starlash Buff
-				Description: Mods.MythosOfMoonlight.Buffs.StarlashBuff.Description
-			}
-
-			StarFlames: {
-				DisplayName: Star Flames
-				Description: Mods.MythosOfMoonlight.Buffs.StarFlames.Description
 			}
 		}
 
@@ -130,21 +120,12 @@ Mods: {
 
 			StarThrower: {
 				DisplayName: Star Thrower
-				Tooltip:
-					'''
-					Lights enemies ablaze with cosmic fire!
-					Has a 67% chance to not consume ammo.
-					Ignores 25 points of enemy defense.
-					'''
+				Tooltip: ""
 			}
 
 			CDGIris: {
 				DisplayName: CDG-Iris
-				Tooltip:
-					'''
-					Cosmos Derived Gun? Cosmos Derived Fun.
-					Fires hitscan rounds
-					'''
+				Tooltip: Cosmos Derived Gun? Cosmos Derived Fun.
 			}
 
 			CommunicatorIris: {
@@ -160,10 +141,8 @@ Mods: {
 				DisplayName: MOC-Iris
 				Tooltip:
 					'''
-					"Mars Originated Cannon"
-					It is still slightly radioactive.
-					Fires a volley of mini-comets after charging up
-					The amount is relative to the time spent charging
+					Mars Originated Cannon, still slightly radioactive.
+					Fires homing Embers after charging up. 
 					'''
 			}
 
@@ -171,8 +150,9 @@ Mods: {
 				DisplayName: Iridic Saber
 				Tooltip:
 					'''
-					Rapidly swings and fires piercing waves of energy every other swing.
-					The energy waves can pierce up to 3 enemies.
+					Every full swing creates a short energy slice forward.
+					Is that a lightsaber?
+					Nope, Even better!
 					'''
 			}
 
@@ -183,12 +163,12 @@ Mods: {
 
 			GalactiteOre: {
 				DisplayName: Galactite Ore
-				Tooltip: It radiates an ancient glow that seems to invite the thought of an age long gone...
+				Tooltip: It shines with old energy.
 			}
 
 			PurpurineQuartz: {
 				DisplayName: Iridic Boards
-				Tooltip: It sems to be some sort of alien technology. Its use is unknown to you.
+				Tooltip: Alien tech, you don't understand it very well
 			}
 
 			MortJavelinItem: {
@@ -331,19 +311,14 @@ Mods: {
 				Tooltip: A small call to the stars
 			}
 
-			EstrellaR: {
-				DisplayName: Estrella R
-				Tooltip: ""
-			}
-
 			RustyWaraxe: {
 				DisplayName: Rusty Waraxe
 				Tooltip: Barely sharp enough to occasionally cut deep wounds
-			}
 
-			SoulCandle: {
-				DisplayName: Soul Candle
-				Tooltip: ""
+				SoulCandle: {
+					DisplayName: Soul Candle
+					Tooltip: ""
+				}
 			}
 
 			TownNPCMood: {
@@ -355,6 +330,11 @@ Mods: {
 				HateCrowded: I hate how crowded I am.
 				LikeNPC_Princess: I like {NPCName}.
 				Princess_LovesNPC: I like {NPCName}.
+			}
+
+			SoulCandle: {
+				Tooltip: ""
+				DisplayName: Soul Candle
 			}
 
 			StarBit: {
@@ -376,7 +356,7 @@ Mods: {
 				DisplayName: Seeing Stars
 				Tooltip:
 					'''
-					'n.'
+					'K. Raibus'
 					Adapted by M. Johnathan
 					'''
 			}
@@ -387,25 +367,13 @@ Mods: {
 			}
 
 			WardingStar: {
-				DisplayName: Warding Stars
-				Tooltip:
-					'''
-					A pair of stars that resonate with eachother very closely.
-					Hold down to charge up a starry blast of energy.
-					'''
+				DisplayName: Warding Star
+				Tooltip: ""
 			}
 
 			StarBaton: {
 				DisplayName: Star Baton
-				Tooltip:
-					'''
-					A baton powered by the night sky.
-					Spin and charge up energy to fling the baton towards the mouse.
-					If you catch it on its way back, held damage increaes by 2.6% and thrown damage increases by 8%.
-					This can stack up to 33% and 100% extra damage, respectively.
-					[c/ffcc35:Let go of left click once charged to fling the baton.]
-					[c/ffcc35:Press and hold left before it returns to catch it.]
-					'''
+				Tooltip: ""
 			}
 
 			BlinkrootI: {
@@ -425,7 +393,7 @@ Mods: {
 
 			Kristellation: {
 				DisplayName: Kristellation
-				Tooltip: pingas
+				Tooltip: ""
 			}
 
 			Starcaller: {
@@ -445,31 +413,6 @@ Mods: {
 
 			ColdwindPendant: {
 				DisplayName: Coldwind Pendant
-				Tooltip: ""
-			}
-
-			Starlash: {
-				DisplayName: Starlash
-				Tooltip: ""
-			}
-
-			StarlashBuffPickup: {
-				DisplayName: Starlash Buff Pickup
-				Tooltip: ""
-			}
-
-			StarWhip: {
-				DisplayName: Star Whip
-				Tooltip: ""
-			}
-
-			CDGIris2: {
-				DisplayName: C D G Iris2
-				Tooltip: ""
-			}
-
-			RustyWaraxeR: {
-				DisplayName: Rusty Waraxe R
 				Tooltip: ""
 			}
 		}
@@ -602,23 +545,6 @@ Mods: {
 			FastScholarArrow.DisplayName: Fast Scholar Arrow
 			ScholarChargeUp.DisplayName: Scholar Charge Up
 			ScholarChargeUp2.DisplayName: Scholar Charge Up2
-			StarlashPro.DisplayName: Starlash Pro
-			StarWhipPro.DisplayName: Star Whip Pro
-			SlashWave.DisplayName: Slash Wave
-			PurpurineSaberProj.DisplayName: Purpurine Saber Proj
-			CrawshotProj.DisplayName: Crawshot Proj
-			EstrellaProj2.DisplayName: Estrella Proj2
-			EstrellaSlashProj.DisplayName: Estrella Slash Proj
-			MOCIrisProj2.DisplayName: M O C Iris Proj2
-			MOCIrisProj3.DisplayName: M O C Iris Proj3
-			TestLaser.DisplayName: Test Laser
-			CDGIrisHeld.DisplayName: C D G Iris Held
-			CDGIrisRound.DisplayName: C D G Iris Round
-			RustyWaraxeSwing.DisplayName: Rusty Waraxe Swing
-			StarThrowerProj.DisplayName: Star Thrower Proj
-			StarryFire.DisplayName: Starry Fire
-			SporeBloomSpore.DisplayName: Spore Bloom Spore
-			SporebloomSpore.DisplayName: Sporebloom Spore
 		}
 
 		NPCs: {
@@ -658,32 +584,12 @@ Mods: {
 			StarveiledScholar.DisplayName: Nightveiled Scholar
 			Moonborn.DisplayName: Moonborn
 			FallingStar.DisplayName: Falling Star
-			Sporebloom.DisplayName: Sporebloom
 		}
 
 		Tiles: {
 			BossTrophy.MapEntry: Boss Trophy
 			Galactite.MapEntry: Galactite
 			GalactiteManuallyPlaced.MapEntry: Galactite Manually Placed
-		}
-
-		Configs: {
-			MythosOfMoonlightConfig: {
-				DisplayName: Mythos Of Moonlight Config
-				Graphics: "[c/00e6e6: Graphics]"
-
-				ParticleLimit: {
-					Label: Particle Limit
-					Tooltip: The maximum amount of particles that may exist simultaneously. Be wary of using higher values (>3000) as it can cause lag in some cases.
-				}
-
-				CanBloomBeUsed: {
-					Label: Allow Bloom Usage
-					Tooltip: Whether or not to enhance some visuals with bloom.
-				}
-
-				Headers.Graphics: Graphics Header
-			}
 		}
 	}
 
