@@ -1,6 +1,7 @@
 ﻿using MythosOfMoonlight.Common.Datastructures;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -360,6 +361,11 @@ namespace MythosOfMoonlight.Common.Utilities
             }
         }
 
+        public static void SetupForTrailing(this Projectile proj, int mode, int length)
+        {
+            ProjectileID.Sets.TrailCacheLength[proj.type] = length;
+            ProjectileID.Sets.TrailingMode[proj.type] = mode;
+        }
 
         public static void ManageHeldProj(this Projectile Projectile, Vector2 armPos, HeldprojSettings settings)
         {

@@ -21,6 +21,7 @@ using MythosOfMoonlight.Items.PurpleComet.Galactite;
 using MythosOfMoonlight.Items.Accessories;
 using MythosOfMoonlight.Projectiles.VFXProjectiles;
 using System.Runtime.CompilerServices;
+using MythosOfMoonlight.Tiles.Furniture.MusicBoxes.PurpleComet;
 
 namespace MythosOfMoonlight
 {
@@ -563,6 +564,7 @@ namespace MythosOfMoonlight
             if (!Main.dedServ)
             {
                 LoadShaders();
+                LoadAllMusic();
             }
 
             On_FilterManager.EndCapture += FilterManager_EndCapture;
@@ -600,6 +602,22 @@ namespace MythosOfMoonlight
 
             Filters.Scene["Asteroid"] = new Filter(new ScreenShaderData("FilterMiniTower").UseColor(0f, 0f, 0f).UseOpacity(0f), EffectPriority.VeryHigh);
             SkyManager.Instance["Asteroid"] = new Events.AsteroidSky();
+        }
+
+        private static void SetupMusicBox(Mod mod, string musicPath, int itemID, int tileID)
+        {
+            MusicLoader.AddMusic(mod, musicPath);
+            MusicLoader.AddMusicBox(mod, MusicLoader.GetMusicSlot(mod, musicPath), itemID, tileID);
+        }
+
+        void LoadAllMusic()
+        {
+            SetupMusicBox(Instance, "Assets/Music/PurpleComet", ItemType<PurpleCometMusicBoxITEM>(), TileType<PurpleCometMusicBox>());
+        }
+
+        public override void PostSetupContent()
+        {
+            
         }
 
         private void Player_SetTalkNPC(Terraria.On_Player.orig_SetTalkNPC orig, Player self, int npcIndex, bool fromNet)

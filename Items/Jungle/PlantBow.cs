@@ -39,7 +39,7 @@ namespace MythosOfMoonlight.Items.Jungle
             Item.channel = true;
 
             Item.value = Item.sellPrice(0, 1, 20, 0);
-            Item.useAmmo = AmmoID.Arrow; //forgor
+            Item.useAmmo = AmmoID.Arrow; 
         }
 
         public override bool CanConsumeAmmo(Item ammo, Player player) => false; //spawning it shouldnt use 1 arrow
@@ -68,6 +68,7 @@ namespace MythosOfMoonlight.Items.Jungle
         public float ArrowLerp = 0f; //for opacity lerp + position lerp
         public float StringLerp = 0f;
         public bool HideArrow = false; 
+
         public override void SetDefaults()
         {
             Projectile.width = 24;
@@ -230,6 +231,8 @@ namespace MythosOfMoonlight.Items.Jungle
             Projectile.timeLeft = 360;
 
             Projectile.DamageType = DamageClass.Ranged;
+
+            Projectile.SetupForTrailing(2, 10);
         }
 
         public override void AI()
@@ -290,6 +293,8 @@ namespace MythosOfMoonlight.Items.Jungle
         {
             tex ??= Request<Texture2D>(Texture).Value;
             texGlow ??= Request<Texture2D>(Texture + "_Glow").Value;
+
+            Projectile.SimpleDrawTrail(tex, Vector2.One, Color.LightGreen * 0.3f, Color.LightPink * 0.5f, 0f);
 
             Projectile.SimpleDrawProjectile(tex, lightColor, false);
             Projectile.SimpleDrawProjectile(texGlow, Color.White, true);

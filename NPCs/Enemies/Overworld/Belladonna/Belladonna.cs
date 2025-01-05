@@ -41,8 +41,8 @@ namespace MythosOfMoonlight.NPCs.Enemies.Overworld.Belladonna
             Texture2D tex = Helper.GetTex(Texture);
             Texture2D glow = Helper.GetTex(Texture + "_Glow");
             SpriteEffects effects = NPC.direction == -1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-            spriteBatch.Draw(tex, NPC.Center - screenPos, NPC.frame, drawColor, NPC.rotation, NPC.Size / 2, NPC.scale, effects, 0);
-            spriteBatch.Draw(glow, NPC.Center - screenPos, NPC.frame, Color.White * ((MathF.Sin(Main.GlobalTimeWrappedHourly * 0.75f) + 1) * 0.5f), NPC.rotation, NPC.Size / 2, NPC.scale, effects, 0);
+            spriteBatch.Draw(tex, NPC.Center - screenPos + new Vector2(0f, 2f), NPC.frame, drawColor, NPC.rotation, NPC.Size / 2, NPC.scale, effects, 0);
+            spriteBatch.Draw(glow, NPC.Center - screenPos + new Vector2(0f, 2f), NPC.frame, Color.White * ((MathF.Sin(Main.GlobalTimeWrappedHourly * 0.75f) + 1) * 0.5f), NPC.rotation, NPC.Size / 2, NPC.scale, effects, 0);
             return false;
         }
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)

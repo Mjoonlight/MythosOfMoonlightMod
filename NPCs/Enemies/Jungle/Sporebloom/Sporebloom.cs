@@ -42,7 +42,7 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
 
             NPC.knockBackResist = 0.7f;
 
-            NPC.HitSound = SoundID.NPCHit1;
+            NPC.HitSound = SoundID.NPCHit19;
             NPC.DeathSound = SoundID.NPCDeath1;
 
             NPC.aiStyle = -1;
@@ -239,7 +239,8 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
         public override void AI()
         {
             CheckTarget(out Player player);
-            Lighting.AddLight(NPC.Center, new Vector3(.19f, .08f, .11f));
+
+            Lighting.AddLight(NPC.Center, Color.Violet.ToVector3() * 0.25f);
 
             if (player is null || player.dead || !player.active)
             {
@@ -351,6 +352,11 @@ namespace MythosOfMoonlight.NPCs.Enemies.Jungle.Sporebloom
 
                             if (Logic[2] == 109f) //barf time!!!
                             {
+                                if (!Main.getGoodWorld) //hawk tuah plays instead
+                                {
+                                    SoundEngine.PlaySound(SoundID.NPCHit18, NPC.Center);
+                                }
+
                                 for(int i = 0; i < 50; i++)
                                 {
                                     Vector2 pos = NPC.Center + Main.rand.NextVector2Circular(10f, 10f);
